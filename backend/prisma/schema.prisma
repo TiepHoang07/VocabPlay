@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String    @id @default(cuid())
+  clerkId         String    @unique
+  email           String    @unique
+  name            String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  words           UserWord[]
+  memorizedWords  MemorizedWord[]
+  chainScores     WordChainScore[]
+  matchScores     MatchingGameScore[]
+}
+
+model UserWord {
+  id            Int       @id @default(autoincrement())
+  userId        String
+  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  word          String
+  meaning       String
+  partOfSpeech  String?
+  example       String?
+  phonetic      String?
+  addedAt       DateTime  @default(now())
+  
+  memorized     MemorizedWord[]
+  
+  @@unique([userId, word])
+  @@index([userId])
+}
+
+model MemorizedWord {
+  id            Int       @id @default(autoincrement())
+  userId        String
+  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  wordId        Int
+  word          UserWord  @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  memorizedAt   DateTime  @default(now())
+  
+  @@unique([userId, wordId])
+  @@index([userId])
+}
+
+model WordChainScore {
+  id            Int       @id @default(autoincrement())
+  userId        String
+  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  longestChain  Int
+  highestScore  Int
+  playedAt      DateTime  @default(now())
+  
+  @@index([userId])
+}
+
+model MatchingGameScore {
+  id            Int       @id @default(autoincrement())
+  userId        String
+  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  pairsCount    Int
+  timeSeconds   Int
+  attempts      Int
+  completedAt   DateTime  @default(now())
+  
+  @@index([userId])
+}
