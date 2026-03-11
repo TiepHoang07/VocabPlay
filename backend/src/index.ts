@@ -26,8 +26,5 @@ app.use((err: any, req: any, res: any, next: any) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📚 Dictionary API ready`);
-  console.log(`🔐 Clerk auth middleware active`);
-  console.log(`🗄️  Neon PostgreSQL connected via Prisma`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
