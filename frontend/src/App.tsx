@@ -6,6 +6,9 @@ import Home from './pages/Home'
 import Practice from './pages/Practice'
 import Games from './pages/Games'
 
+import WordChain from './pages/WordChain'
+import MemoryMatch from './pages/MemoryMatch'
+
 function App() {
   return (
     <BrowserRouter>
@@ -16,6 +19,8 @@ function App() {
           <Route path="dictionary" element={<Dictionary />} />
           <Route path="practice" element={<Practice />} />
           <Route path="games" element={<Games />} />
+          <Route path="games/word-chain" element={<WordChain />} />
+          <Route path="games/memory" element={<MemoryMatch />} />
         </Route>
       </Routes>
     </BrowserRouter>

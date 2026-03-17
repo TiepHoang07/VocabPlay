@@ -72,27 +72,6 @@ export default function Home() {
           )
         })}
       </div>
-
-      {/* Stats Preview */}
-      {isSignedIn && (
-        <div className="bg-white rounded-2xl p-8 shadow-sm border">
-          <h2 className="text-2xl font-semibold mb-6">Your Progress</h2>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-3xl font-bold text-blue-600">0</div>
-              <div className="text-gray-600">Words Saved</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-green-600">0</div>
-              <div className="text-gray-600">Memorized</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-purple-600">0</div>
-              <div className="text-gray-600">Games Played</div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

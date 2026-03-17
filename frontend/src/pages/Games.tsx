@@ -9,7 +9,7 @@ export default function Games() {
       icon: Split,
       color: 'purple',
       link: '/games/word-chain',
-      comingSoon: true
+      comingSoon: false
     },
     {
       title: 'Memory Match',
@@ -17,7 +17,7 @@ export default function Games() {
       icon: Grid,
       color: 'pink',
       link: '/games/memory',
-      comingSoon: true
+      comingSoon: false
     }
   ]
 

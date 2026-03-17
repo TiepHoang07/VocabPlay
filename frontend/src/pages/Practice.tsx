@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { Layers, Loader2, BookOpen } from "lucide-react";
-import { getUserWords, deleteWord } from "../api/words";
+import { getUserWords, deleteWord, memorizeWord } from "../api/words";
 import { useApi } from "../hooks/useApi"; // Import the hook
 import FlipCard from "../components/FlipCard";
 import toast from "react-hot-toast";
@@ -12,14 +12,14 @@ interface Word {
   meaning: string;
   partOfSpeech?: string;
   example?: string;
-  memorized: any[];
+  memorized: boolean;
 }
 
 export default function Practice() {
   const { isSignedIn, isLoaded } = useAuth();
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"" | "memorized">("");
+  const [filter, setFilter] = useState<"learning" | "memorized">("learning");
   const { authRequest } = useApi();
 
   const fetchWords = useCallback(async () => {
@@ -27,9 +27,9 @@ export default function Practice() {
     try {
       const fetchedWords = await getUserWords(authRequest);
       if (filter === "memorized") {
-        setWords(fetchedWords.filter((w: Word) => w.memorized && w.memorized.length > 0));
+        setWords(fetchedWords.filter((w: Word) => w.memorized === true));
       } else {
-        setWords(fetchedWords);
+        setWords(fetchedWords.filter((w: Word) => !w.memorized));
       }
     } catch (error) {
       console.error("API Error:", error);
@@ -46,15 +46,21 @@ export default function Practice() {
   }, [isLoaded, isSignedIn, fetchWords]);
 
   const handleMemorize = async (wordId: number) => {
-    toast.success("Word memorized!");
-    // Re-fetch to update UI
-    fetchWords();
+    try {
+      await memorizeWord(authRequest, wordId);
+      toast.success("Word memorized!");
+      // Re-fetch
+      fetchWords();
+    } catch (error) {
+      toast.error("Failed to memorize word");
+    }
   };
 
   const handleDelete = async (wordId: number) => {
     try {
       await deleteWord(authRequest, wordId);
-      // Re-fetch to update UI
+      toast.success("Word deleted");
+      // Re-fetch
       fetchWords();
     } catch (error) {
       toast.error("Failed to delete word");
@@ -87,20 +93,22 @@ export default function Practice() {
         {/* Filter */}
         <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
           <button
-            onClick={() => setFilter("")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === ""
+            onClick={() => setFilter("learning")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              filter === "learning"
                 ? "bg-blue-600 text-white"
                 : "text-gray-600 hover:bg-gray-100"
-              }`}
+            }`}
           >
-            All Words
+            Learning
           </button>
           <button
             onClick={() => setFilter("memorized")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === "memorized"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              filter === "memorized"
                 ? "bg-green-600 text-white"
                 : "text-gray-600 hover:bg-gray-100"
-              }`}
+            }`}
           >
             Memorized
           </button>
@@ -136,7 +144,7 @@ export default function Practice() {
               meaning={word.meaning}
               partOfSpeech={word.partOfSpeech}
               example={word.example}
-              isMemorized={word.memorized && word.memorized.length > 0}
+              isMemorized={word.memorized}
               onMemorize={handleMemorize}
               onDelete={handleDelete}
             />

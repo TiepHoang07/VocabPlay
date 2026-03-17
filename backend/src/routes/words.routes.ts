@@ -4,7 +4,8 @@ import {
   searchWord,
   addWord,
   getUserWords,
-  deleteWord
+  deleteWord,
+  memorizeWord
 } from '../controllers/words.controller';
 
 const router = Router();
@@ -16,5 +17,6 @@ router.get('/search/:word', searchWord);
 router.get('/', authMiddleware, getUserWords);
 router.post('/', authMiddleware, addWord);
 router.delete('/:id', authMiddleware, deleteWord);
+router.post('/:id/memorize', authMiddleware, memorizeWord);
 
 export default router;

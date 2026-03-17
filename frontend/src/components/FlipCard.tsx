@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Check, Trash2, RotateCw } from 'lucide-react'
-import toast from 'react-hot-toast'
 
 interface FlipCardProps {
   id: number
@@ -29,17 +28,16 @@ export default function FlipCard({
     setIsFlipped(!isFlipped)
   }
 
-  const handleMemorize = (e: React.MouseEvent) => {
+  const handleMemorize = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    onMemorize(id)
-    toast.success('Marked as memorized!')
+    await onMemorize(id)
   }
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    console.log("deleting");
     e.stopPropagation()
     if (window.confirm(`Delete "${word}" from your dictionary?`)) {
-      onDelete(id)
-      toast.success('Word deleted')
+      await onDelete(id)
     }
   }
 
@@ -47,9 +45,8 @@ export default function FlipCard({
     <div className="relative group perspective">
       {/* Flip Card Container */}
       <div
-        className={`relative w-full h-48 cursor-pointer transition-transform duration-500 transform-style-3d ${
-          isFlipped ? 'rotate-y-180' : ''
-        }`}
+        className={`relative w-full h-48 cursor-pointer transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''
+          }`}
         onClick={handleFlip}
       >
         {/* Front */}
@@ -77,14 +74,14 @@ export default function FlipCard({
         {!isMemorized && (
           <button
             onClick={handleMemorize}
-            className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 shadow-lg"
+            className="p-2 bg-green-500 cursor-pointer text-white rounded-full hover:bg-green-600 shadow-lg"
           >
             <Check className="h-4 w-4" />
           </button>
         )}
         <button
           onClick={handleDelete}
-          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg"
+          className="p-2 bg-red-500 text-white cursor-pointer rounded-full hover:bg-red-600 shadow-lg"
         >
           <Trash2 className="h-4 w-4" />
         </button>

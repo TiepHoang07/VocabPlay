@@ -46,7 +46,6 @@ export const getUserWords = async (req: Request, res: Response) => {
       where: { userId: user.id },
       orderBy: { addedAt: "desc" },
     });
-    console.log("words", words);
 
     console.log(`Found ${words.length} words`);
     res.json(words);
@@ -123,16 +122,78 @@ export const deleteWord = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Word ID must be a number" });
     }
 
-    await prisma.userWord.deleteMany({
+    console.log(`Attempting to delete word ${wordId} for user ${user.id}`);
+
+    const deleted = await prisma.userWord.deleteMany({
       where: {
         id: wordId,
         userId: user.id,
       },
     });
 
+    console.log(`Deletion result:`, deleted);
+
+    if (deleted.count === 0) {
+      return res.status(404).json({ error: "Word not found or unauthorized" });
+    }
+
     res.json({ message: "Word deleted successfully" });
   } catch (error) {
-    console.error("❌ Delete word error:", error);
+    console.error("Delete word error:", error);
     res.status(500).json({ error: "Failed to delete word" });
   }
 };
+
+export const memorizeWord = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const clerkId = (req as any).userId;
+
+    if (!clerkId) {
+      return res.status(401).json({ error: "You must be sign in"})
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId }
+    })
+
+    if (!user) {
+      return res.status(401).json({ error:  "User not found in database"})
+    }
+
+    if (!id || Array.isArray(id)) {
+      return res.status(400).json({ error: "Invalid word ID"})
+    }
+
+    const wordId = parseInt(id)
+
+    if (isNaN(wordId)) {
+      return res.status(400).json({ error: "Word ID must be a number"})
+    }
+
+    const word = await prisma.userWord.findFirst({
+      where: {
+        id: wordId,
+        userId: user.id
+      }
+    })
+
+    if (!word) {
+      return res.status(404).json({ error: "Word not found"})
+    }
+
+    const updatedWord = await prisma.userWord.update({
+      where: {
+        id: wordId
+      },
+      data: {
+        memorized: true
+      }
+    })
+
+    res.json(updatedWord)
+  } catch (error) {
+    console.error("Memorize word error:", error)
+    res.status(500).json({ error: "Failed to memorize word"})
+  }
+}

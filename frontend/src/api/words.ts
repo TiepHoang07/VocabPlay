@@ -16,6 +16,12 @@ export const addWordToDictionary = async (authRequest: any, wordData: any) => {
   return response.data;
 };
 
+export const memorizeWord = async (authRequest: any, id: number) => {
+  const response = await authRequest("post", `/words/${id}/memorize`);
+  return response.data;
+};
+
+
 export const deleteWord = async (authRequest: any, id: number) => {
   const response = await authRequest("delete", `/words/${id}`);
   return response.data;

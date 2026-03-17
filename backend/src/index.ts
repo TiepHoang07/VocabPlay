@@ -50,8 +50,6 @@ app.use((req, _res, next) => {
   next();
 });
 
-
-
 // Test route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -23,7 +23,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   words          UserWord[]
-  memorizedWords MemorizedWord[]
   chainScores    WordChainScore[]
   matchScores    MatchingGameScore[]
 }
@@ -37,23 +36,11 @@ model UserWord {
   example      String?
   phonetic     String?
   addedAt      DateTime @default(now())
+  memorized    Boolean  @default(false)
 
-  memorized MemorizedWord[]
   user      User            @relation(fields: [userId], references: [id])
 
   @@unique([userId, word])
-  @@index([userId])
-}
-
-model MemorizedWord {
-  id          Int      @id @default(autoincrement())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  wordId      Int
-  word        UserWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
-  memorizedAt DateTime @default(now())
-
-  @@unique([userId, wordId])
   @@index([userId])
 }
 
