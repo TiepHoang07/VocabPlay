@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth';
+import { authMiddleware } from '../middleware/auth';
 import {
   searchWord,
   addWord,
@@ -9,9 +9,12 @@ import {
 
 const router = Router();
 
+// Public route
 router.get('/search/:word', searchWord);
-router.get('/', requireAuth, getUserWords);
-router.post('/', requireAuth, addWord);
-router.delete('/:id', requireAuth, deleteWord);
+
+// Protected routes
+router.get('/', authMiddleware, getUserWords);
+router.post('/', authMiddleware, addWord);
+router.delete('/:id', authMiddleware, deleteWord);
 
 export default router;

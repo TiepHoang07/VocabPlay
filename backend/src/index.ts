@@ -1,55 +1,65 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { clerkMiddleware } from '@clerk/express';
 import { handleClerkWebhook } from './webhooks/clerk';
 import wordsRouter from './routes/words.routes';
+import { clerkMiddleware } from '@clerk/express';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ⚠️ IMPORTANT: Webhook route must come BEFORE express.json()
-// Because webhook needs RAW body for signature verification
+// Webhook route
 app.post(
   '/api/webhooks/clerk',
-  express.raw({ type: 'application/json' }), // This gives us raw buffer
+  express.raw({ type: 'application/json' }),
   async (req, res) => {
     try {
-      console.log('📨 Webhook received');
-      await handleClerkWebhook(req.body, req.headers);
-      res.status(200).json({ received: true });
+      const result = await handleClerkWebhook(req.body, req.headers);
+      res.status(200).json(result);
     } catch (err) {
-      console.error('❌ Webhook error:', err);
+      console.error('Webhook error:', err);
       res.status(400).json({ error: 'Webhook error' });
     }
   }
 );
 
-// Regular middleware for all other routes
-app.use(clerkMiddleware());
+// Debug: log every incoming request before any middleware
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(cors({
   origin: 'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json()); // This now comes AFTER webhook route
 
-// Routes
-app.use('/api/words', wordsRouter);
+app.use(express.json());
 
-// Health check (useful for testing)
+// Clerk middleware
+app.use(clerkMiddleware({
+  secretKey: process.env.CLERK_SECRET_KEY,
+}));
+
+// Debug: confirm clerkMiddleware passed through
+app.use((req, _res, next) => {
+  console.log(`[clerk-passed] ${req.method} ${req.url} | auth:`, !!(req as any).auth?.userId);
+  next();
+});
+
+
+
+// Test route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Error handler (keep at the end)
-app.use((err: any, req: any, res: any, next: any) => {
-  console.error('❌ Server error:', err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+// API Routes
+app.use('/api/words', wordsRouter);
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📝 Webhook endpoint: http://localhost:${PORT}/api/webhooks/clerk`);
+  console.log(`Server running on PORT: ${PORT}`);
 });

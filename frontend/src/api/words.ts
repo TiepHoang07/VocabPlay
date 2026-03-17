@@ -1,22 +1,22 @@
-import { api } from './client'
+import { api } from "./client"
+
+
+export const getUserWords = async (authRequest: any) => {
+  const res = await authRequest("get", "/words");
+  return res.data;
+};
 
 export const searchWord = async (word: string) => {
-  const response = await api.get(`/words/search/${word}`)
-  return response.data
-}
+  const response = await api.get(`/words/search/${word}`);
+  return response.data;
+};
 
-export const addWordToDictionary = async (wordData: any) => {
-  const response = await api.post('/words', wordData)
-  return response.data
-}
+export const addWordToDictionary = async (authRequest: any, wordData: any) => {
+  const response = await authRequest("post", "/words", wordData);
+  return response.data;
+};
 
-export const getUserWords = async (filter?: string) => {
-  const params = filter ? { filter } : {}
-  const response = await api.get('/words', { params })
-  return response.data
-}
-
-export const deleteWord = async (id: number) => {
-  const response = await api.delete(`/words/${id}`)
-  return response.data
-}
+export const deleteWord = async (authRequest: any, id: number) => {
+  const response = await authRequest("delete", `/words/${id}`);
+  return response.data;
+};

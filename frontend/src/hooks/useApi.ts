@@ -1,34 +1,22 @@
-import { useAuth } from '@clerk/clerk-react'
-import { api } from '../api/client'
-import { useEffect } from 'react'
+import { useCallback } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { api } from "../api/client";
 
 export const useApi = () => {
-  const { getToken } = useAuth()
+  const { getToken } = useAuth();
 
-  useEffect(() => {
-    // Add request interceptor
-    const requestInterceptor = api.interceptors.request.use(
-      async (config) => {
-        try {
-          const token = await getToken()
-          if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-          }
-        } catch (error) {
-          console.error('Failed to get auth token:', error)
-        }
-        return config
+  const authRequest = useCallback(async (method: string, url: string, data?: any) => {
+    const token = await getToken();
+
+    return api({
+      method,
+      url,
+      data,
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      (error) => {
-        return Promise.reject(error)
-      }
-    )
+    });
+  }, [getToken]);
 
-    // Cleanup interceptor on unmount
-    return () => {
-      api.interceptors.request.eject(requestInterceptor)
-    }
-  }, [getToken])
-
-  return api
-}
+  return { authRequest };
+};

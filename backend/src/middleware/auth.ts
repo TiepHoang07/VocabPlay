@@ -1,40 +1,28 @@
-import { Request, Response, NextFunction } from 'express';
-import { createClerkClient } from '@clerk/clerk-sdk-node';
+import { verifyToken } from "@clerk/backend";
 
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
-
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: string;
-    }
-  }
-}
-
-export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: any, res: any, next: any) => {
   try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'No token provided' });
+
+    const header = req.headers.authorization;
+
+    if (!header) {
+      return res.status(401).json({ error: "Missing Authorization header" });
     }
 
-    const token = authHeader.substring(7);
-    
-    // Verify the token with Clerk
-    const claims = await clerkClient.verifyToken(token);
-    
-    if (!claims || !claims.sub) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
+    console.log("verifying token");
 
-    // Set user ID from Clerk's subject claim
-    req.userId = claims.sub;
+    const token = header.replace("Bearer ", "");
+
+    const payload = await verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY!,
+    });
+
+    req.userId = payload.sub;
+
     next();
-  } catch (error) {
-    console.error('Auth error:', error);
-    return res.status(401).json({ error: 'Authentication failed' });
+
+  } catch (err) {
+    console.error("AUTH ERROR:", err);
+    res.status(401).json({ error: "Invalid token" });
   }
 };

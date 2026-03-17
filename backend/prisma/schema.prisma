@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -14,67 +14,68 @@ datasource db {
 }
 
 model User {
-  id              String    @id @default(cuid())
-  clerkId         String    @unique
-  email           String    @unique
-  name            String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  words           UserWord[]
-  memorizedWords  MemorizedWord[]
-  chainScores     WordChainScore[]
-  matchScores     MatchingGameScore[]
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  words          UserWord[]
+  memorizedWords MemorizedWord[]
+  chainScores    WordChainScore[]
+  matchScores    MatchingGameScore[]
 }
 
 model UserWord {
-  id            Int       @id @default(autoincrement())
-  userId        String
-  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  word          String
-  meaning       String
-  partOfSpeech  String?
-  example       String?
-  phonetic      String?
-  addedAt       DateTime  @default(now())
-  
-  memorized     MemorizedWord[]
-  
+  id           Int      @id @default(autoincrement())
+  userId       String
+  word         String
+  meaning      String
+  partOfSpeech String?
+  example      String?
+  phonetic     String?
+  addedAt      DateTime @default(now())
+
+  memorized MemorizedWord[]
+  user      User            @relation(fields: [userId], references: [id])
+
   @@unique([userId, word])
   @@index([userId])
 }
 
 model MemorizedWord {
-  id            Int       @id @default(autoincrement())
-  userId        String
-  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  wordId        Int
-  word          UserWord  @relation(fields: [wordId], references: [id], onDelete: Cascade)
-  memorizedAt   DateTime  @default(now())
-  
+  id          Int      @id @default(autoincrement())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  wordId      Int
+  word        UserWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  memorizedAt DateTime @default(now())
+
   @@unique([userId, wordId])
   @@index([userId])
 }
 
 model WordChainScore {
-  id            Int       @id @default(autoincrement())
-  userId        String
-  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  longestChain  Int
-  highestScore  Int
-  playedAt      DateTime  @default(now())
-  
+  id           Int      @id @default(autoincrement())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  longestChain Int
+  highestScore Int
+  playedAt     DateTime @default(now())
+
   @@index([userId])
 }
 
 model MatchingGameScore {
-  id            Int       @id @default(autoincrement())
-  userId        String
-  user          User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  pairsCount    Int
-  timeSeconds   Int
-  attempts      Int
-  completedAt   DateTime  @default(now())
-  
+  id          Int      @id @default(autoincrement())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  pairsCount  Int
+  timeSeconds Int
+  attempts    Int
+  completedAt DateTime @default(now())
+
   @@index([userId])
 }

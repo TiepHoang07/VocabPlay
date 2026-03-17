@@ -1,107 +1,138 @@
-import { Request, Response } from 'express';
-import prisma from '../services/prisma';
-import { getWordDefinition } from '../services/dictionary';
+import { Request, Response } from "express";
+import prisma from "../services/prisma";
+import { getWordDefinition } from "../services/dictionary";
 
 export const searchWord = async (req: Request, res: Response) => {
   try {
     const { word } = req.params;
-    
-    // Check if word is undefined or an array
+
     if (!word || Array.isArray(word)) {
-      return res.status(400).json({ error: 'Invalid word parameter' });
+      return res.status(400).json({ error: "Invalid word parameter" });
     }
 
     const definition = await getWordDefinition(word);
     res.json(definition);
   } catch (error: any) {
-    res.status(404).json({ error: error.message || 'Word not found' });
-  }
-};
-
-export const addWord = async (req: Request, res: Response) => {
-  try {
-    const userId = req.userId;
-    const { word, meaning, partOfSpeech, example, phonetic } = req.body;
-
-    let user = await prisma.user.findUnique({
-      where: { clerkId: userId }
-    });
-
-    if (!user) {
-      return Error("You have to sign in first !")
-    }
-
-    const newWord = await prisma.userWord.create({
-      data: {
-        userId: userId!,
-        word: word.toLowerCase(),
-        meaning,
-        partOfSpeech,
-        example,
-        phonetic
-      }
-    });
-
-    res.status(201).json(newWord);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      res.status(400).json({ error: 'Word already in your dictionary' });
-    } else {
-      res.status(500).json({ error: 'Failed to add word' });
-    }
+    res.status(404).json({ error: error.message || "Word not found" });
   }
 };
 
 export const getUserWords = async (req: Request, res: Response) => {
   try {
-    const userId = req.userId;
-    const { filter } = req.query;
+    // Log the entire auth object to see its structure
+    console.log('Full auth object:', JSON.stringify((req as any).auth, null, 2));
 
-    let whereClause: any = { userId };
+    const clerkId = (req as any).userId;
 
-    if (filter === 'memorized') {
-      whereClause.memorized = { some: {} };
+    console.log('Clerk ID from auth:', clerkId);
+
+    if (!clerkId) {
+      console.log('No clerkId in request');
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    // Find user in database by clerkId
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
+    });
+
+    console.log('User found:', user ? 'Yes' : 'No');
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found in database" });
     }
 
     const words = await prisma.userWord.findMany({
-      where: whereClause,
-      include: {
-        memorized: true
-      },
-      orderBy: { addedAt: 'desc' }
+      where: { userId: user.id },
+      orderBy: { addedAt: "desc" },
+    });
+    console.log("words", words);
+
+    console.log(`Found ${words.length} words`);
+    res.json(words);
+  } catch (err) {
+    console.error('Error in getUserWords:', err);
+    res.status(500).json({ error: "Failed to fetch words" });
+  }
+};
+
+export const addWord = async (req: Request, res: Response) => {
+  try {
+    const clerkId = (req as any).userId;
+    const { word, meaning, partOfSpeech, example, phonetic } = req.body;
+
+    console.log("addWord - clerkId:", clerkId);
+
+    if (!clerkId) {
+      return res.status(401).json({ error: "You must be signed in" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
     });
 
-    res.json(words);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch words' });
+    if (!user) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+
+    const newWord = await prisma.userWord.create({
+      data: {
+        userId: user.id,
+        word: word.toLowerCase(),
+        meaning,
+        partOfSpeech,
+        example,
+        phonetic,
+      },
+    });
+    res.status(201).json(newWord);
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      res.status(400).json({ error: "Word already in your dictionary" });
+    } else {
+      console.error("Add word error:", error);
+      res.status(500).json({ error: "Failed to add word" });
+    }
   }
 };
 
 export const deleteWord = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.userId;
+    const clerkId = (req as any).userId;
 
-    // Ensure id is a string and convert to number
+    if (!clerkId) {
+      return res.status(401).json({ error: "You must be signed in" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+
     if (!id || Array.isArray(id)) {
-      return res.status(400).json({ error: 'Invalid word ID' });
+      return res.status(400).json({ error: "Invalid word ID" });
     }
 
     const wordId = parseInt(id);
-    
+
     if (isNaN(wordId)) {
-      return res.status(400).json({ error: 'Word ID must be a number' });
+      return res.status(400).json({ error: "Word ID must be a number" });
     }
 
     await prisma.userWord.deleteMany({
       where: {
         id: wordId,
-        userId
-      }
+        userId: user.id,
+      },
     });
 
-    res.json({ message: 'Word deleted successfully' });
+    res.json({ message: "Word deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete word' });
+    console.error("❌ Delete word error:", error);
+    res.status(500).json({ error: "Failed to delete word" });
   }
 };

@@ -1,66 +1,76 @@
-import { useEffect, useState } from 'react'
-import { useAuth } from '@clerk/clerk-react'
-import { Layers, Loader2, BookOpen } from 'lucide-react'
-import { getUserWords, deleteWord } from '../api/words'
-import FlipCard from '../components/FlipCard'
-import toast from 'react-hot-toast'
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { Layers, Loader2, BookOpen } from "lucide-react";
+import { getUserWords, deleteWord } from "../api/words";
+import { useApi } from "../hooks/useApi"; // Import the hook
+import FlipCard from "../components/FlipCard";
+import toast from "react-hot-toast";
 
 interface Word {
-  id: number
-  word: string
-  meaning: string
-  partOfSpeech?: string
-  example?: string
-  memorized: any[]
+  id: number;
+  word: string;
+  meaning: string;
+  partOfSpeech?: string;
+  example?: string;
+  memorized: any[];
 }
 
 export default function Practice() {
-  const { isSignedIn } = useAuth()
-  const [words, setWords] = useState<Word[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'memorized'>('all')
+  const { isSignedIn, isLoaded } = useAuth();
+  const [words, setWords] = useState<Word[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"" | "memorized">("");
+  const { authRequest } = useApi();
+
+  const fetchWords = useCallback(async () => {
+    setLoading(true);
+    try {
+      const fetchedWords = await getUserWords(authRequest);
+      if (filter === "memorized") {
+        setWords(fetchedWords.filter((w: Word) => w.memorized && w.memorized.length > 0));
+      } else {
+        setWords(fetchedWords);
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to load words");
+    } finally {
+      setLoading(false);
+    }
+  }, [authRequest, filter]);
 
   useEffect(() => {
-    if (isSignedIn) {
-      fetchWords()
+    if (isLoaded && isSignedIn) {
+      fetchWords();
     }
-  }, [isSignedIn, filter])
-
-  const fetchWords = async () => {
-    try {
-      setLoading(true)
-      const data = await getUserWords(filter === 'memorized' ? 'memorized' : undefined)
-      setWords(data)
-    } catch (error) {
-      toast.error('Failed to load words')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [isLoaded, isSignedIn, fetchWords]);
 
   const handleMemorize = async (wordId: number) => {
-    // TODO: Implement memorize functionality
-    toast.success('Word memorized!')
-    fetchWords()
-  }
+    toast.success("Word memorized!");
+    // Re-fetch to update UI
+    fetchWords();
+  };
 
   const handleDelete = async (wordId: number) => {
     try {
-      await deleteWord(wordId)
-      fetchWords()
+      await deleteWord(authRequest, wordId);
+      // Re-fetch to update UI
+      fetchWords();
     } catch (error) {
-      toast.error('Failed to delete word')
+      toast.error("Failed to delete word");
     }
-  }
+  };
 
   if (!isSignedIn) {
     return (
       <div className="text-center py-20">
         <Layers className="h-16 w-16 text-gray-300 mx-auto mb-4" />
         <h2 className="text-2xl font-semibold mb-2">Sign in to practice</h2>
-        <p className="text-gray-600">Create an account to start building your vocabulary</p>
+        <p className="text-gray-600">
+          Create an account to start building your vocabulary
+        </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -69,28 +79,28 @@ export default function Practice() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
-          <p className="text-gray-600 mt-1">Flip cards to learn and memorize words</p>
+          <p className="text-gray-600 mt-1">
+            Flip cards to learn and memorize words
+          </p>
         </div>
 
         {/* Filter */}
         <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
           <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            onClick={() => setFilter("")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === ""
+                ? "bg-blue-600 text-white"
+                : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             All Words
           </button>
           <button
-            onClick={() => setFilter('memorized')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              filter === 'memorized'
-                ? 'bg-green-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            onClick={() => setFilter("memorized")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === "memorized"
+                ? "bg-green-600 text-white"
+                : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             Memorized
           </button>
@@ -110,7 +120,7 @@ export default function Practice() {
             Start by adding words from the dictionary
           </p>
           <button
-            onClick={() => window.location.href = '/dictionary'}
+            onClick={() => (window.location.href = "/dictionary")}
             className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700"
           >
             Go to Dictionary
@@ -126,7 +136,7 @@ export default function Practice() {
               meaning={word.meaning}
               partOfSpeech={word.partOfSpeech}
               example={word.example}
-              isMemorized={word.memorized.length > 0}
+              isMemorized={word.memorized && word.memorized.length > 0}
               onMemorize={handleMemorize}
               onDelete={handleDelete}
             />
@@ -134,5 +144,5 @@ export default function Practice() {
         </div>
       )}
     </div>
-  )
+  );
 }
