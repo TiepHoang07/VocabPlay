@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Check, Brain, Trash2, RotateCw } from 'lucide-react'
+import { Brain, Trash2, RotateCw } from 'lucide-react'
+import DeleteWordModal from './DeleteWordModal'
 
 interface FlipCardProps {
   id: number
@@ -9,7 +10,7 @@ interface FlipCardProps {
   example?: string
   isMemorized?: boolean
   onMemorize: (id: number) => void
-  onDelete: (id: number) => void
+  onDelete: (id: number) => Promise<void>
 }
 
 export default function FlipCard({
@@ -23,6 +24,8 @@ export default function FlipCard({
   onDelete
 }: FlipCardProps) {
   const [isFlipped, setIsFlipped] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped)
@@ -33,66 +36,93 @@ export default function FlipCard({
     await onMemorize(id)
   }
 
-  const handleDelete = async (e: React.MouseEvent) => {
-    console.log("deleting");
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (window.confirm(`Delete "${word}" from your dictionary?`)) {
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true)
+    try {
       await onDelete(id)
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteModalOpen(false)
     }
   }
 
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false)
+  }
+
   return (
-    <div className="relative group perspective">
-      {/* Flip Card Container */}
-      <div
-        className={`relative w-full h-48 cursor-pointer transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''
-          }`}
-        onClick={handleFlip}
-      >
-        {/* Front */}
-        <div className="absolute w-full h-full backface-hidden bg-green-color rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
-          <h3 className="text-2xl font-bold text-white mb-2">{word}</h3>
-          {partOfSpeech && (
-            <span className="text-sm text-gray-100">{partOfSpeech}</span>
-          )}
-          <div className="absolute bottom-3 left-3 text-xs text-gray-300 flex items-center gap-1">
-            <RotateCw className="h-3 w-3" /> Click to flip
+    <>
+      <div className="relative group perspective">
+        {/* Flip Card Container */}
+        <div
+          className={`relative w-full h-48 cursor-pointer transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''
+            }`}
+          onClick={handleFlip}
+        >
+          {/* Front */}
+          <div className="absolute w-full h-full backface-hidden bg-green-color rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center border-b-4 border-dark-green-color/30">
+            <h3 className="text-3xl font-bold text-white mb-2 drop-shadow-sm">{word}</h3>
+            {partOfSpeech && (
+              <span className="text-sm text-gray-100">{partOfSpeech}</span>
+            )}
+            <div className="absolute bottom-3 left-3 text-xs text-gray-300 flex items-center gap-1">
+              <RotateCw className="h-3 w-3" /> Click to flip
+            </div>
+          </div>
+
+          {/* Back */}
+          <div className="absolute w-full h-full flex items-center backface-hidden bg-yellow-color rounded-2xl shadow-lg p-6 overflow-y-auto rotate-y-180 text-center border-b-4 border-dark-blue-color/10">
+            <div className="w-full">
+              <p className="text-dark-blue-color font-bold text-lg mb-3 leading-tight">{meaning}</p>
+              {example && (
+                <p className="text-sm text-dark-blue-color/70 font-medium italic mt-3 bg-white/30 p-3 rounded-xl border border-white/20 shadow-inner">
+                  "{example}"
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Back */}
-        <div className="absolute w-full h-full flex items-center backface-hidden bg-[#FFD150] rounded-xl shadow-md p-4 overflow-y-auto rotate-y-180 text-center ">
-          <p className="text-white font-bold text-md mb-2">{meaning}</p>
-          {example && (
-            <p className="text-xs text-gray-50 font-semibold italic mt-2">"{example}"</p>
+        {/* Action Buttons Overlay */}
+        <div className="absolute top-3 right-3 flex flex-row gap-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform scale-90 md:scale-100">
+          {!isMemorized && (
+            <button
+              onClick={handleMemorize}
+              className="p-2.5 bg-white/50 backdrop-blur-md text-green-600 rounded-full shadow-lg hover:bg-green-50 hover:scale-110 active:scale-95 transition-all cursor-pointer border border-green-600"
+              title="Mark as Memorized"
+            >
+              <Brain className="h-5 w-5" />
+            </button>
           )}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        {!isMemorized && (
           <button
-            onClick={handleMemorize}
-            className="p-2 bg-green-500 cursor-pointer text-white rounded-full hover:bg-green-600 shadow-lg"
+            onClick={handleDeleteClick}
+            className="p-2.5 bg-white/50 backdrop-blur-md text-red-500 rounded-full shadow-lg hover:bg-red-50 hover:scale-110 active:scale-95 transition-all cursor-pointer border border-red-600"
+            title="Delete Word"
           >
-            <Brain className="h-4 w-4" />
+            <Trash2 className="h-5 w-5" />
           </button>
+        </div>
+
+        {/* Memorized Badge */}
+        {isMemorized && (
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-green-700 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg border border-green-100 shadow-sm z-10">
+            ✓ Memorized
+          </div>
         )}
-        <button
-          onClick={handleDelete}
-          className="p-2 bg-red-500 text-white cursor-pointer rounded-full hover:bg-red-600 shadow-lg"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
       </div>
 
-      {/* Memorized Badge */}
-      {isMemorized && (
-        <div className="absolute top-2 right-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-          ✓ Memorized
-        </div>
-      )}
-    </div>
+      <DeleteWordModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        wordName={word}
+        isDeleting={isDeleting}
+      />
+    </>
   )
 }

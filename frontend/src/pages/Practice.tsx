@@ -90,24 +90,23 @@ export default function Practice() {
           </p>
         </div>
 
-        {/* Filter */}
-        <div className="flex items-center gap-2 bg-yellow-color rounded-xl p-1 shadow-sm">
+        <div className="flex items-center gap-1.5 bg-gray-100/50 backdrop-blur-sm rounded-2xl p-1.5 shadow-inner">
           <button
             onClick={() => setFilter("learning")}
-            className={`px-6 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
               filter === "learning"
-                ? "bg-blue-color text-white"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-blue-color text-white shadow-lg shadow-blue-color/20 translate-z-10"
+                : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
             }`}
           >
             Learning
           </button>
           <button
             onClick={() => setFilter("memorized")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
               filter === "memorized"
-                ? "bg-dark-green-color text-white"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-dark-green-color text-white shadow-lg shadow-dark-green-color/20 translate-z-10"
+                : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
             }`}
           >
             Memorized
@@ -129,7 +128,7 @@ export default function Practice() {
           </p>
           <button
             onClick={() => (window.location.href = "/dictionary")}
-            className="bg-yellow-color text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:bg-blue-color"
+            className="bg-blue-color text-white font-bold px-8 py-3.5 rounded-2xl shadow-xl shadow-blue-color/20 transition-all hover:bg-dark-blue-color hover:-translate-y-1 active:scale-95 cursor-pointer"
           >
             Go to Dictionary
           </button>

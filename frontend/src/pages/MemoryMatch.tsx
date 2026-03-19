@@ -143,24 +143,26 @@ export default function MemoryMatch() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-pink-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-dark-green-color" />
       </div>
     );
   }
 
   if (insufficientWords) {
     return (
-      <div className="text-center py-20 bg-white rounded-2xl shadow-sm max-w-2xl mx-auto border border-pink-100">
-        <Grid className="h-16 w-16 text-pink-200 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Not enough words</h3>
-        <p className="text-gray-600 mb-6">
-          You need at least 4 saved words to play Memory Match.
+      <div className="text-center py-16 bg-white rounded-3xl shadow-xl shadow-dark-green-color/5 max-w-2xl mx-auto border-2 border-gray-50 p-8">
+        <div className="w-20 h-20 bg-dark-green-color/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Grid className="h-10 w-10 text-dark-green-color" />
+        </div>
+        <h3 className="text-2xl font-black text-gray-900 mb-2">Not enough words</h3>
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          You need at least 4 saved words to play Memory Match. Let's add some more to your collection!
         </p>
         <div className="flex justify-center gap-4">
-          <Link to="/games" className="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 font-medium transition">
+          <Link to="/games" className="bg-gray-100 text-gray-700 px-8 py-4 rounded-2xl hover:bg-gray-200 font-bold transition-all active:scale-95">
             Back to Games
           </Link>
-          <Link to="/dictionary" className="bg-pink-600 text-white px-6 py-3 rounded-xl hover:bg-pink-700 font-medium transition">
+          <Link to="/dictionary" className="bg-dark-green-color text-white px-8 py-4 rounded-2xl hover:bg-green-color shadow-lg shadow-dark-green-color/20 font-bold transition-all active:scale-95">
             Go to Dictionary
           </Link>
         </div>
@@ -178,61 +180,74 @@ export default function MemoryMatch() {
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Games
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-              <Grid className="h-6 w-6 text-pink-600" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Memory Match</h1>
-              <p className="text-gray-600">Find the matching word and meaning pairs.</p>
-            </div>
+        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-dark-green-color/10 shadow-sm">
+          <div className="w-14 h-14 bg-dark-green-color rounded-2xl flex items-center justify-center shadow-lg shadow-dark-green-color/20 transition-transform hover:rotate-12">
+            <Grid className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Memory Match</h1>
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Find the pairs</p>
           </div>
         </div>
+        </div>
         
-        <div className="flex gap-4 text-center">
-          <div className="bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-            <div className="text-sm text-gray-500 font-medium">Moves</div>
-            <div className="text-xl font-bold text-gray-900">{moves}</div>
+        <div className="flex gap-4">
+          <div className="bg-white rounded-2xl px-6 py-3 shadow-lg shadow-gray-200/50 border-2 border-gray-50 text-center">
+            <div className="text-[10px] text-gray-400 font-black uppercase tracking-wider mb-1">Moves</div>
+            <div className="text-2xl font-black text-gray-900">{moves}</div>
           </div>
-          <div className="bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-            <div className="text-sm text-gray-500 font-medium">Matches</div>
-            <div className="text-xl font-bold text-pink-600">{matches}/{targetMatches}</div>
+          <div className="bg-white rounded-2xl px-6 py-3 shadow-lg shadow-gray-200/50 border-2 border-gray-50 text-center">
+            <div className="text-[10px] text-gray-400 font-black uppercase tracking-wider mb-1">Matches</div>
+            <div className="text-2xl font-black text-dark-green-color">{matches}/{targetMatches}</div>
           </div>
         </div>
       </div>
 
       {isGameComplete && (
-        <div className="bg-green-50 rounded-2xl p-8 text-center border border-green-200">
-          <h2 className="text-2xl font-bold text-green-800 mb-2">Victory!</h2>
-          <p className="text-green-700 mb-6">You matched all {targetMatches} pairs in {moves} moves.</p>
+        <div className="bg-dark-green-color rounded-3xl p-10 text-center shadow-2xl shadow-dark-green-color/30 animate-in zoom-in duration-500 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)] opacity-30"></div>
+          <h2 className="text-4xl font-black text-white mb-3 relative z-10">Victory! 🎉</h2>
+          <p className="text-green-50 mb-8 text-lg relative z-10 font-medium">You identified all {targetMatches} vocabulary pairs in <span className="underline decoration-yellow-color decoration-4 underline-offset-4">{moves}</span> moves.</p>
           <button 
             onClick={initializeGame}
-            className="bg-green-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-green-700 transition shadow-sm"
+            className="bg-white text-dark-green-color px-10 py-4 rounded-2xl font-black hover:bg-yellow-color hover:text-dark-blue-color shadow-xl transition-all hover:-translate-y-1 active:scale-95 relative z-10 cursor-pointer"
           >
             Play Again
           </button>
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 perspective">
         {cards.map((card, index) => (
           <div 
             key={`${card.id}-${index}`}
             onClick={() => handleCardClick(index)}
             className={`
-              aspect-[4/3] rounded-xl cursor-pointer transition-all duration-300 transform-gpu
-              ${card.isFlipped || card.isMatched 
-                ? 'bg-white shadow-md border-2 border-pink-100 shadow-pink-50/50' 
-                : 'bg-pink-50 hover:bg-pink-100 border-2 border-transparent shadow-sm hover:-translate-y-1'
-              }
-              ${card.isMatched ? 'opacity-60 saturate-50' : ''}
-              flex items-center justify-center p-4 text-center
+              relative aspect-[4/3] cursor-pointer transition-all duration-500 transform-style-3d
+              ${card.isFlipped || card.isMatched ? 'rotate-y-180' : ''}
+              ${card.isMatched ? 'opacity-0 scale-90 pointer-events-none' : ''}
+              hover:scale-105
             `}
           >
-            <div className={`transition-opacity duration-300 ${card.isFlipped || card.isMatched ? 'opacity-100' : 'opacity-0'}`}>
-              <span className={`font-medium ${card.type === 'word' ? 'text-lg text-gray-900 front-bold' : 'text-sm text-gray-600 max-h-[100px] overflow-hidden'}`}>
+            {/* Front of Card (Hidden initially) */}
+            <div className={`
+              absolute inset-0 backface-hidden rounded-2xl flex items-center justify-center p-6 text-center shadow-xl border-2
+              ${card.type === 'word' 
+                ? 'bg-white border-dark-green-color/20' 
+                : 'bg-yellow-color/10 border-yellow-color/30'
+              }
+              rotate-y-180
+            `}>
+              <span className={`font-black tracking-tight ${card.type === 'word' ? 'text-2xl text-dark-green-color' : 'text-sm text-gray-700 leading-tight'}`}>
                 {card.text}
               </span>
+            </div>
+
+            {/* Back of Card (Pattern/Placeholder) */}
+            <div className="absolute inset-0 backface-hidden bg-dark-green-color rounded-2xl flex items-center justify-center shadow-lg border-b-4 border-black/20">
+              <div className="w-10 h-10 border-4 border-white/20 rounded-full flex items-center justify-center">
+                <Grid className="h-5 w-5 text-white/50" />
+              </div>
             </div>
           </div>
         ))}

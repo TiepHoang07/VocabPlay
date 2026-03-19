@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { ArrowLeft, Split } from 'lucide-react';
+import { ArrowLeft, Split, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -50,44 +50,50 @@ export default function WordChain() {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Games
         </Link>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-            <Split className="h-6 w-6 text-purple-600" />
+        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-blue-color/10 shadow-sm">
+          <div className="w-14 h-14 bg-blue-color rounded-2xl flex items-center justify-center shadow-lg shadow-blue-color/20 transition-transform hover:rotate-12">
+            <Split className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Word Chain</h1>
-            <p className="text-gray-600">Current Score: <span className="font-bold text-purple-600">{chain.length}</span></p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Word Chain</h1>
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">
+              Current Score: <span className="text-blue-color">{chain.length}</span>
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-purple-100">
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+      <div className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-color/5 border-2 border-gray-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-color/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+        
+        <form onSubmit={handleSubmit} className="flex gap-3 mb-10 relative z-10">
           <input
             type="text"
             value={inputWord}
             onChange={(e) => setInputWord(e.target.value)}
-            placeholder={chain.length > 0 ? `Enter a word starting with '${chain[chain.length - 1].slice(-1)}'` : 'Enter starting word'}
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder={chain.length > 0 ? `Starts with '${chain[chain.length - 1].slice(-1).toUpperCase()}'...` : 'Enter any word to start!'}
+            className="flex-1 px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none text-lg font-medium"
             required
             autoFocus
           />
           <button
             type="submit"
-            className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition"
+            className="bg-blue-color text-white px-8 py-4 rounded-2xl font-bold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 hover:-translate-y-0.5 transition-all active:scale-95 cursor-pointer flex items-center gap-2"
           >
             Submit
           </button>
         </form>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3 relative z-10">
           {chain.map((word, index) => (
-            <div key={index} className="flex items-center">
-              <span className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg border border-purple-200 font-medium">
+            <div key={index} className="flex items-center group animate-in fade-in slide-in-from-left-4 duration-300">
+              <span className="px-5 py-2.5 bg-blue-color/5 text-blue-color rounded-2xl border-2 border-blue-color/10 font-bold text-lg shadow-sm group-hover:bg-blue-color group-hover:text-white group-hover:border-blue-color transition-all">
                 {word}
               </span>
               {index < chain.length - 1 && (
-                <span className="mx-2 text-gray-400">→</span>
+                <div className="mx-1 text-blue-color/30 font-black text-xl">
+                  <ArrowRight className="h-5 w-5" />
+                </div>
               )}
             </div>
           ))}

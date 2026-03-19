@@ -6,22 +6,22 @@
   --color-blue-color: #088395;
   --color-dark-blue-color: #09637E;
   --color-green-color: #44A194;
-  --color-dark-green-color: #458B73;
+  --color-dark-green-color: #098f67;
 }
 
 @layer utilities {
   .perspective {
     perspective: 1000px;
   }
-  
+
   .transform-style-3d {
     transform-style: preserve-3d;
   }
-  
+
   .backface-hidden {
     backface-visibility: hidden;
   }
-  
+
   .rotate-y-180 {
     transform: rotateY(180deg);
   }

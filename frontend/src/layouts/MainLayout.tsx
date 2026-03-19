@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 
 export default function MainLayout() {
   return (
-    <div className="min-h-screen bg-yellow-50">
+    <div className="min-h-screen bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px]">
       {/* Navigation Bar */}
       <Navbar />
 
