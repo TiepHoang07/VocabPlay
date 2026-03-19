@@ -3,7 +3,13 @@ import axios from 'axios';
 const MERRIAM_WEBSTER_API_KEY = process.env.MERRIAM_WEBSTER_API_KEY;
 const BASE_URL = 'https://www.dictionaryapi.com/api/v3/references/learners/json';
 
-// --- Type Definitions ---
+// Helper function to clean word (remove :1, :2, etc. suffixes)
+function cleanWord(word: string): string {
+  if (!word) return word;
+  // Remove any colon followed by numbers at the end
+  return word.replace(/:\d+$/, '');
+}
+
 export interface FormattedDefinition {
   word: string;
   phonetic?: string;
@@ -30,39 +36,12 @@ interface MerriamWebsterEntry {
   dros?: any[];
 }
 
-// --- Core Function ---
-export const getWordDefinition = async (word: string): Promise<FormattedDefinition> => {
-  try {
-    // Fetch from API
-    const url = `${BASE_URL}/${word.toLowerCase()}?key=${MERRIAM_WEBSTER_API_KEY}`;
-    const response = await axios.get(url);
-    const data = response.data;
-
-    // Handle case where word doesn't exist
-    if (!data || data.length === 0) {
-      throw new Error('Word not found');
-    }
-
-    // Parse the first entry
-    const entry: MerriamWebsterEntry = data[0];
-    const result = parseEntry(entry, word);
-
-    return result;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 404) {
-        throw new Error('Word not found');
-      }
-      console.error('Dictionary API error:', error.message);
-      throw new Error('Failed to fetch definition');
-    }
-    throw error;
-  }
-};
-
-// --- Helper Function to Parse a Single Entry ---
 function parseEntry(entry: MerriamWebsterEntry, originalWord: string): FormattedDefinition {
-  // Extract Pronunciation & Audio
+  // Clean the word from the meta.id or original word
+  const rawWord = entry.meta?.id || originalWord;
+  const cleanedWord = cleanWord(rawWord);
+  
+  // Extract pronunciation and audio
   let phonetic = '';
   let audio = '';
   if (entry.hwi?.prs && entry.hwi.prs.length > 0) {
@@ -74,11 +53,9 @@ function parseEntry(entry: MerriamWebsterEntry, originalWord: string): Formatted
     }
   }
 
-  // Extract Part of Speech and Short Definition
   const partOfSpeech = entry.fl || '';
   const shortDefinition = entry.shortdef ? entry.shortdef[0] : '';
 
-  // Parse detailed definitions and examples
   const definitions: { definition: string; examples: string[] }[] = [];
   const idioms: { phrase: string; definition: string; examples: string[] }[] = [];
 
@@ -95,7 +72,7 @@ function parseEntry(entry: MerriamWebsterEntry, originalWord: string): Formatted
   }
 
   return {
-    word: entry.meta?.id || originalWord,
+    word: cleanedWord, // Use the cleaned word
     phonetic,
     audio,
     partOfSpeech,
@@ -105,7 +82,6 @@ function parseEntry(entry: MerriamWebsterEntry, originalWord: string): Formatted
   };
 }
 
-// --- Helper to Parse a Single Definition Group ---
 function parseDefinitionGroup(defGroup: any, definitions: { definition: string; examples: string[] }[]) {
   if (!defGroup.sseq) return;
   
@@ -136,7 +112,6 @@ function parseDefinitionGroup(defGroup: any, definitions: { definition: string; 
   }
 }
 
-// --- Helper to Parse an Idiom ---
 function parseIdiom(dro: any, idioms: { phrase: string; definition: string; examples: string[] }[]) {
   const phrase = dro.drp || '';
   let defText = '';
@@ -168,12 +143,36 @@ function parseIdiom(dro: any, idioms: { phrase: string; definition: string; exam
   }
   
   if (phrase && defText) {
-    idioms.push({ phrase, definition: defText, examples });
+    // Clean idiom phrases too if they have suffixes
+    const cleanedPhrase = cleanWord(phrase);
+    idioms.push({ phrase: cleanedPhrase, definition: defText, examples });
   }
 }
 
-// --- Helper to Clean Text (Remove MW Markup) ---
 function cleanText(text: string): string {
-  // Remove {bc}, {it}, {dx}, etc. markers and trim
   return text.replace(/{[^}]*}/g, '').replace(/<[^>]*>/g, '').trim();
 }
+
+export const getWordDefinition = async (word: string): Promise<FormattedDefinition> => {
+  try {
+    const url = `${BASE_URL}/${word.toLowerCase()}?key=${MERRIAM_WEBSTER_API_KEY}`;
+    const response = await axios.get(url);
+    const data = response.data;
+
+    if (!data || data.length === 0) {
+      throw new Error('Word not found');
+    }
+
+    const entry: MerriamWebsterEntry = data[0];
+    return parseEntry(entry, word);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 404) {
+        throw new Error('Word not found');
+      }
+      console.error('Dictionary API error:', error.message);
+      throw new Error('Failed to fetch definition');
+    }
+    throw error;
+  }
+};

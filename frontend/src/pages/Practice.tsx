@@ -91,12 +91,12 @@ export default function Practice() {
         </div>
 
         {/* Filter */}
-        <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
+        <div className="flex items-center gap-2 bg-yellow-color rounded-xl p-1 shadow-sm">
           <button
             onClick={() => setFilter("learning")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-6 py-2 rounded-lg text-sm font-medium transition ${
               filter === "learning"
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-color text-white"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
@@ -106,7 +106,7 @@ export default function Practice() {
             onClick={() => setFilter("memorized")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               filter === "memorized"
-                ? "bg-green-600 text-white"
+                ? "bg-dark-green-color text-white"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
@@ -129,7 +129,7 @@ export default function Practice() {
           </p>
           <button
             onClick={() => (window.location.href = "/dictionary")}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700"
+            className="bg-yellow-color text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:bg-blue-color"
           >
             Go to Dictionary
           </button>

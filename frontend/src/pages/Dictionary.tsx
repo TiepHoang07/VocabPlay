@@ -20,6 +20,7 @@ export default function Dictionary() {
     setLoading(true);
     try {
       const result = await searchWord(word);
+      console.log(result);
       setDefinition(result);
     } catch (error) {
       toast.error("Word not found");
@@ -54,7 +55,7 @@ export default function Dictionary() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen py-8 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -81,7 +82,7 @@ export default function Dictionary() {
             <button
               onClick={handleSearch}
               disabled={searching || !word.trim()}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-3 bg-green-color text-white rounded-xl cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -113,9 +114,9 @@ export default function Dictionary() {
               </div>
               <button
                 onClick={handleAddToDictionary}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                className="px-4 py-2 bg-blue-color hover:bg-dark-blue-color text-white rounded-lg cursor-pointer transition"
               >
-                + Add to Dictionary
+                + Add to Practice
               </button>
             </div>
 

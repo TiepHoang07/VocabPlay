@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-yellow-color: #FFDE42;
+  --color-cyan-color: #53CBF3;
+  --color-blue-color: #088395;
+  --color-dark-blue-color: #09637E;
+  --color-green-color: #44A194;
+  --color-dark-green-color: #458B73;
+}
+
 @layer utilities {
   .perspective {
     perspective: 1000px;

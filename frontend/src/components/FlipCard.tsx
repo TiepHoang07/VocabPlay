@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, Trash2, RotateCw } from 'lucide-react'
+import { Check, Brain, Trash2, RotateCw } from 'lucide-react'
 
 interface FlipCardProps {
   id: number
@@ -50,10 +50,10 @@ export default function FlipCard({
         onClick={handleFlip}
       >
         {/* Front */}
-        <div className="absolute w-full h-full backface-hidden bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center border-2 border-gray-100">
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">{word}</h3>
+        <div className="absolute w-full h-full backface-hidden bg-green-color rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
+          <h3 className="text-2xl font-bold text-white mb-2">{word}</h3>
           {partOfSpeech && (
-            <span className="text-sm text-gray-400">{partOfSpeech}</span>
+            <span className="text-sm text-gray-100">{partOfSpeech}</span>
           )}
           <div className="absolute bottom-3 left-3 text-xs text-gray-300 flex items-center gap-1">
             <RotateCw className="h-3 w-3" /> Click to flip
@@ -61,10 +61,10 @@ export default function FlipCard({
         </div>
 
         {/* Back */}
-        <div className="absolute w-full h-full backface-hidden bg-blue-50 rounded-xl shadow-md p-4 overflow-y-auto rotate-y-180 border-2 border-blue-100">
-          <p className="text-gray-800 text-sm mb-2">{meaning}</p>
+        <div className="absolute w-full h-full flex items-center backface-hidden bg-[#FFD150] rounded-xl shadow-md p-4 overflow-y-auto rotate-y-180 text-center ">
+          <p className="text-white font-bold text-md mb-2">{meaning}</p>
           {example && (
-            <p className="text-xs text-gray-600 italic mt-2">"{example}"</p>
+            <p className="text-xs text-gray-50 font-semibold italic mt-2">"{example}"</p>
           )}
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function FlipCard({
             onClick={handleMemorize}
             className="p-2 bg-green-500 cursor-pointer text-white rounded-full hover:bg-green-600 shadow-lg"
           >
-            <Check className="h-4 w-4" />
+            <Brain className="h-4 w-4" />
           </button>
         )}
         <button
