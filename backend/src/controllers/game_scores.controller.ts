@@ -11,13 +11,6 @@ export const updateWordChainScore = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const wordChainScore = await prisma.wordChainScore.create({
-            data: {
-                userId: user.id,
-                score,
-            },
-        });
-
         if (score > user.highestScore) {
             await prisma.user.update({
                 where: { clerkId },
@@ -25,7 +18,7 @@ export const updateWordChainScore = async (req: Request, res: Response) => {
             });
         }
 
-        res.json(wordChainScore);
+        res.json(score);
     } catch (error) {
         console.error('Error updating word chain score:', error);
         res.status(500).json({ error: 'Failed to update word chain score' });
@@ -42,13 +35,6 @@ export const updateMatchingGameScore = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const matchingGameScore = await prisma.matchingGameScore.create({
-            data: {
-                userId: user.id,
-                time,
-            },
-        });
-
         if (user.fastestTime === 0 || time < user.fastestTime) {
             await prisma.user.update({
                 where: { clerkId },
@@ -56,7 +42,7 @@ export const updateMatchingGameScore = async (req: Request, res: Response) => {
             });
         }
 
-        res.json(matchingGameScore);
+        res.json(time);
     } catch (error) {
         console.error('Error updating matching game score:', error);
         res.status(500).json({ error: 'Failed to update matching game score' });

@@ -61,8 +61,8 @@ export default function MemoryMatch() {
       }
       setInsufficientWords(false);
 
-      // Take up to 6 random words
-      const shuffledWords = [...allWords].sort(() => 0.5 - Math.random()).slice(0, 6);
+      // Take up to 4 random words
+      const shuffledWords = [...allWords].sort(() => 0.5 - Math.random()).slice(0, 4);
       setTargetMatches(shuffledWords.length);
 
       const gameCards: Card[] = [];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { Trophy, Medal, Timer, Split, Star, User as UserIcon, Loader2 } from 'lucide-react';
+import { Medal, Timer, Split, Star, User as UserIcon, Loader2 } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 import {
     getWordChainLeaderboard,
@@ -70,7 +70,7 @@ export default function Leaderboard() {
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
             {/* Header section */}
             <div className="flex flex-col items-center justify-center space-y-4">
-                <img className='w-80 h-50 border-b-4 border-b-yellow-color' src="penguin_leaderboard.webp" alt="Penguin Leaderboard" />
+                <img className='w-88 h-50 border-b-4 border-b-yellow-color' src="penguin_leaderboard.webp" alt="Penguin Leaderboard" />
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight">Hall of Fame</h1>
                 <p className="text-gray-500 text-lg max-w-lg mx-auto">
                     Celebrate the top vocabulary masters in our community. Are you on the list?
@@ -105,7 +105,7 @@ export default function Leaderboard() {
             <div className="flex p-1.5 bg-gray-100/50 rounded-2xl max-w-md mx-auto relative overflow-hidden">
                 <button
                     onClick={() => setActiveTab('wordChain')}
-                    className={`relative z-10 flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'wordChain' ? 'bg-white text-blue-color shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                    className={`relative cursor-pointer z-10 flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'wordChain' ? 'bg-white text-blue-color shadow-sm' : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     <Split className="h-4 w-4" />
@@ -113,7 +113,7 @@ export default function Leaderboard() {
                 </button>
                 <button
                     onClick={() => setActiveTab('matchingGame')}
-                    className={`relative z-10 flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'matchingGame' ? 'bg-white text-green-color shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                    className={`relative cursor-pointer z-10 flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'matchingGame' ? 'bg-white text-green-color shadow-sm' : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     <Timer className="h-4 w-4" />

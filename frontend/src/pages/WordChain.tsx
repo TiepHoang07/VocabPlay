@@ -15,6 +15,18 @@ export default function WordChain() {
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState(0);
   const [highestScore, setHighestScore] = useState(0);
+  const [isGameComplete, setIsGameComplete] = useState(false);
+  const [time, setTime] = useState(10);
+  const [isActive, setIsActive] = useState(false);
+
+  const initializeGame = () => {
+    setChain([]);
+    setInputWord('');
+    setScore(0);
+    setTime(10);
+    setIsActive(false);
+    setIsGameComplete(false);
+  };
 
   useEffect(() => {
     const fetchHighScore = async () => {
@@ -24,7 +36,32 @@ export default function WordChain() {
     fetchHighScore();
   }, [authRequest]);
 
+  useEffect(() => {
+    let interval: any = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        setTime((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  useEffect(() => {
+    if (time === 0) {
+      if (score > highestScore) {
+        setHighestScore(score);
+        updateWordChainScore(authRequest, score);
+      }
+      setIsGameComplete(true);
+      setIsActive(false);
+      setChain([]);
+    }
+  }, [time]);
+
   const handleSubmit = async (e: React.FormEvent) => {
+    setIsGameComplete(false);
     e.preventDefault();
     const word = inputWord.trim().toLowerCase();
 
@@ -33,8 +70,16 @@ export default function WordChain() {
     setLoading(true);
     try {
       const result = await searchWord(word);
-      if (!result) {
+      console.log(result);
+      if (!result || result.definitions.length < 1 && !result.shortDefinition) {
         toast.error('Word not found!');
+        if (score > highestScore) {
+          setHighestScore(score);
+          updateWordChainScore(authRequest, score);
+        }
+        setIsGameComplete(true);
+        setIsActive(false);
+        setChain([]);
         return;
       }
 
@@ -43,14 +88,29 @@ export default function WordChain() {
         const requiredLetter = lastWord[lastWord.length - 1];
         if (word[0] !== requiredLetter) {
           toast.error(`Word must start with '${requiredLetter}'!`);
+          if (score > highestScore) {
+            setHighestScore(score);
+            updateWordChainScore(authRequest, score);
+          }
+          setIsGameComplete(true);
+          setIsActive(false);
+          setChain([]);
           return;
         }
         if (chain.includes(word)) {
           toast.error('Word already used in this chain!');
+          if (score > highestScore) {
+            setHighestScore(score);
+            updateWordChainScore(authRequest, score);
+          }
+          setIsGameComplete(true);
+          setIsActive(false);
+          setChain([]);
           return;
         }
       }
-
+      setTime(10);
+      setIsActive(true);
       const newChain = [...chain, word];
       setChain(newChain);
       setInputWord('');
@@ -59,7 +119,9 @@ export default function WordChain() {
       setScore(newScore);
 
       // Save score to backend (handle error silently)
-      await updateWordChainScore(authRequest, newScore);
+      if (newScore > highestScore) {
+        await updateWordChainScore(authRequest, newScore);
+      }
     } catch (error) {
       console.error("Game score update failed:", error);
     } finally {
@@ -101,6 +163,15 @@ export default function WordChain() {
       </div>
 
       <div className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-color/5 border-2 border-gray-50 relative overflow-hidden">
+        <p className="text-sm font-bold text-gray-700 tracking-widest">
+          Time: <span className="text-blue-color">{time}</span>
+        </p>
+        <div className='w-full relative mt-2 h-4 bg-gray-100 shadow-inner rounded-full'>
+          <div className='absolute top-0 left-0 h-full bg-green-color shadow-lg shadow-green-color/20 shadow-inner rounded-full transition-all duration-200 ease-linear' style={{ width: `${(time / 10) * 100}%` }}></div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-color/5 border-2 border-gray-50 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-color/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
 
         <form onSubmit={handleSubmit} className="flex gap-3 mb-10 relative z-10">
@@ -122,6 +193,20 @@ export default function WordChain() {
             {loading ? 'Validating...' : 'Submit'}
           </button>
         </form>
+
+        {isGameComplete && (
+          <div className="bg-dark-green-color rounded-3xl p-10 text-center shadow-2xl shadow-dark-green-color/30 animate-in zoom-in duration-500 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)] opacity-30"></div>
+            <h2 className="text-4xl font-black text-white mb-3 relative z-10">Nice play! 🎉</h2>
+            <p className="text-green-50 mb-8 text-lg relative z-10 font-medium">You made it with <span className="underline decoration-yellow-color decoration-4 underline-offset-4">{score}</span> words.</p>
+            <button
+              onClick={() => initializeGame()}
+              className="bg-white text-dark-green-color px-10 py-4 rounded-2xl font-black hover:bg-yellow-color hover:text-dark-blue-color shadow-xl transition-all hover:-translate-y-1 active:scale-95 relative z-10 cursor-pointer"
+            >
+              Play Again
+            </button>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-3 relative z-10">
           {chain.map((word, index) => (
