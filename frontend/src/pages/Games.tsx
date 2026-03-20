@@ -60,8 +60,9 @@ export default function Games() {
               {!game.comingSoon && (
                 <Link
                   to={game.link}
-                  className="inline-flex items-center gap-2 text-dark-blue-color font-black text-sm uppercase tracking-widest group-hover:gap-4 transition-all"
+                  className="relative inline-flex items-center gap-2 text-dark-blue-color font-black text-sm uppercase tracking-widest group-hover:gap-4 group-hover:text-white transition-all border-2 border-blue-color rounded-md px-4 py-2"
                 >
+                  <span className="absolute top-0 left-0 w-0 h-full bg-blue-color -z-10 group-hover:w-full transition-all duration-300"></span>
                   Play Now <ArrowRight className="h-5 w-5" />
                 </Link>
               )}

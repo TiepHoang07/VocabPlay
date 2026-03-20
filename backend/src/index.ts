@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { handleClerkWebhook } from './webhooks/clerk';
 import wordsRouter from './routes/words.routes';
+import gameScoresRouter from './routes/game_scores.routes';
 import { clerkMiddleware } from '@clerk/express';
 
 dotenv.config();
@@ -57,6 +58,7 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/words', wordsRouter);
+app.use('/api/game-scores', gameScoresRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT: ${PORT}`);

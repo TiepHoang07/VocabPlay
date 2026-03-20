@@ -1,36 +1,70 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { ArrowLeft, Split, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { searchWord } from '../api/words';
+import { useApi } from '../hooks/useApi';
+import { updateWordChainScore, getWordChainHighScore } from '../api/gameScores';
 
 export default function WordChain() {
   const { isSignedIn } = useAuth();
+  const { authRequest } = useApi();
   const [chain, setChain] = useState<string[]>([]);
   const [inputWord, setInputWord] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [score, setScore] = useState(0);
+  const [highestScore, setHighestScore] = useState(0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchHighScore = async () => {
+      const data = await getWordChainHighScore(authRequest);
+      if (data?.highestScore) setHighestScore(data.highestScore);
+    };
+    fetchHighScore();
+  }, [authRequest]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const word = inputWord.trim().toLowerCase();
-    
-    if (!word) return;
 
-    if (chain.length > 0) {
-      const lastWord = chain[chain.length - 1];
-      const requiredLetter = lastWord[lastWord.length - 1];
-      if (word[0] !== requiredLetter) {
-        toast.error(`Word must start with '${requiredLetter}'!`);
+    if (!word || loading) return;
+
+    setLoading(true);
+    try {
+      const result = await searchWord(word);
+      if (!result) {
+        toast.error('Word not found!');
         return;
       }
-      if (chain.includes(word)) {
-        toast.error('Word already used in this chain!');
-        return;
+
+      if (chain.length > 0) {
+        const lastWord = chain[chain.length - 1];
+        const requiredLetter = lastWord[lastWord.length - 1];
+        if (word[0] !== requiredLetter) {
+          toast.error(`Word must start with '${requiredLetter}'!`);
+          return;
+        }
+        if (chain.includes(word)) {
+          toast.error('Word already used in this chain!');
+          return;
+        }
       }
+
+      const newChain = [...chain, word];
+      setChain(newChain);
+      setInputWord('');
+      toast.success('Valid word!');
+      const newScore = newChain.length;
+      setScore(newScore);
+
+      // Save score to backend (handle error silently)
+      await updateWordChainScore(authRequest, newScore);
+    } catch (error) {
+      console.error("Game score update failed:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setChain([...chain, word]);
-    setInputWord('');
-    toast.success('Valid word!');
   };
 
   if (!isSignedIn) {
@@ -56,8 +90,11 @@ export default function WordChain() {
           </div>
           <div>
             <h1 className="text-3xl font-black text-gray-900 tracking-tight">Word Chain</h1>
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">
-              Current Score: <span className="text-blue-color">{chain.length}</span>
+            <p className="text-sm font-bold text-gray-700 tracking-widest">
+              Highest Score: <span className="text-blue-color">{highestScore}</span>
+            </p>
+            <p className="text-sm font-bold text-gray-700 tracking-widest">
+              Current Score: <span className="text-blue-color">{score}</span>
             </p>
           </div>
         </div>
@@ -65,22 +102,24 @@ export default function WordChain() {
 
       <div className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-color/5 border-2 border-gray-50 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-color/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-        
+
         <form onSubmit={handleSubmit} className="flex gap-3 mb-10 relative z-10">
           <input
             type="text"
             value={inputWord}
             onChange={(e) => setInputWord(e.target.value)}
+            disabled={loading}
             placeholder={chain.length > 0 ? `Starts with '${chain[chain.length - 1].slice(-1).toUpperCase()}'...` : 'Enter any word to start!'}
-            className="flex-1 px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none text-lg font-medium"
+            className="flex-1 px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none text-lg font-medium disabled:opacity-50"
             required
             autoFocus
           />
           <button
             type="submit"
-            className="bg-blue-color text-white px-8 py-4 rounded-2xl font-bold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 hover:-translate-y-0.5 transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+            disabled={loading}
+            className="bg-blue-color text-white px-6 py-3 rounded-2xl font-bold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 hover:-translate-y-0.5 transition-all active:scale-95 cursor-pointer flex items-center gap-2 disabled:opacity-50"
           >
-            Submit
+            {loading ? 'Validating...' : 'Submit'}
           </button>
         </form>
 

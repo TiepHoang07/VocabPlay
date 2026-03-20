@@ -5,7 +5,7 @@ import {
   UserButton,
 } from "@clerk/clerk-react";
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, Layers, Gamepad2, Home, Menu, X } from "lucide-react";
+import { BookOpen, Layers, Gamepad2, Home, Menu, X, Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
@@ -23,6 +23,7 @@ export default function Navbar() {
     { to: "/dictionary", icon: BookOpen, label: "Dictionary" },
     { to: "/practice", icon: Layers, label: "Practice" },
     { to: "/games", icon: Gamepad2, label: "Games" },
+    { to: "/leaderboard", icon: Trophy, label: "Leaderboard" },
   ];
 
   return (

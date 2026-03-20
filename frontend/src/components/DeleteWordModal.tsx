@@ -18,13 +18,8 @@ export default function DeleteWordModal({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop with motion-safe blur */}
-            <div 
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
-                onClick={onClose}
-            />
-            
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 mx-4">
+
             {/* Modal Container */}
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
                 <div className="p-8">
@@ -36,7 +31,7 @@ export default function DeleteWordModal({
 
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Delete Word?</h2>
                         <p className="text-gray-600 mb-10 leading-relaxed">
-                            Are you sure you want to delete <span className="font-semibold text-gray-900">"{wordName}"</span>? 
+                            Are you sure you want to delete <span className="font-semibold text-gray-900">"{wordName}"</span>?
                             This action will permanently remove it from your dictionary.
                         </p>
 
@@ -68,7 +63,7 @@ export default function DeleteWordModal({
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Subtle bottom accent */}
                 <div className="h-1.5 bg-red-500/10 w-full" />
             </div>

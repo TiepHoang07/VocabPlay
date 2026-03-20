@@ -53,7 +53,7 @@ export default function Home() {
             <Link
               key={feature.title}
               to={feature.link}
-              className="group bg-green-color rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"
+              className="group bg-blue-color rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"
             >
               <div className={`w-12 h-12 bg-yellow-color rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all shadow-lg shadow-yellow-color/20`}>
                 <Icon className={`h-6 w-6 text-white`} />

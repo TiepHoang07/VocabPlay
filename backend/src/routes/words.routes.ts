@@ -19,4 +19,5 @@ router.post('/', authMiddleware, addWord);
 router.delete('/:id', authMiddleware, deleteWord);
 router.post('/:id/memorize', authMiddleware, memorizeWord);
 
+
 export default router;

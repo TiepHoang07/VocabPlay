@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useApi } from '../hooks/useApi';
 import { getUserWords } from '../api/words';
+import { updateMatchingGameScore, getMatchingGameFastestTime } from '../api/gameScores';
 
 interface Word {
   id: number;
@@ -24,7 +25,7 @@ interface Card {
 export default function MemoryMatch() {
   const { isSignedIn, isLoaded } = useAuth();
   const { authRequest } = useApi();
-  
+
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -33,15 +34,26 @@ export default function MemoryMatch() {
   const [targetMatches, setTargetMatches] = useState(0);
   const [insufficientWords, setInsufficientWords] = useState(false);
 
+  // timer states
+  const [timer, setTimer] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [bestTime, setBestTime] = useState(0);
+
   const initializeGame = useCallback(async () => {
     setLoading(true);
     setFlippedCards([]);
     setMoves(0);
     setMatches(0);
+    setTimer(0);
+    setIsActive(false);
     try {
+      // Fetch best time from backend
+      const data = await getMatchingGameFastestTime(authRequest);
+      if (data?.fastestTime) setBestTime(data.fastestTime);
+
       const allWords: Word[] = await getUserWords(authRequest);
-      
-      // We need at least 4 words for a good game
+
+      // need at least 4 words for a good game
       if (allWords.length < 4) {
         setInsufficientWords(true);
         setLoading(false);
@@ -89,9 +101,27 @@ export default function MemoryMatch() {
     }
   }, [isLoaded, isSignedIn, initializeGame]);
 
+  // Timer logic
+  useEffect(() => {
+    let interval: any = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive]);
+
   const handleCardClick = (index: number) => {
     if (flippedCards.length === 2) return; // Prevent more than 2 flips
     if (cards[index].isFlipped || cards[index].isMatched) return; // Already flipped/matched
+
+    // Start timer on first flip
+    if (!isActive && matches < targetMatches) {
+      setIsActive(true);
+    }
 
     const newCards = [...cards];
     newCards[index].isFlipped = true;
@@ -114,9 +144,17 @@ export default function MemoryMatch() {
           matchedCards[secondIndex].isMatched = true;
           setCards(matchedCards);
           setFlippedCards([]);
-          setMatches((prev) => prev + 1);
+          const newMatches = matches + 1;
+          setMatches(newMatches);
+
+          if (newMatches === targetMatches) {
+            setIsActive(false);
+            // Save time to backend
+            updateMatchingGameScore(authRequest, timer).catch(console.error);
+          }
+
           toast.success("Match found!");
-        }, 500);
+        }, 1000);
       } else {
         // No match
         setTimeout(() => {
@@ -125,7 +163,7 @@ export default function MemoryMatch() {
           resetCards[secondIndex].isFlipped = false;
           setCards(resetCards);
           setFlippedCards([]);
-        }, 1000);
+        }, 1500);
       }
     }
   };
@@ -180,25 +218,31 @@ export default function MemoryMatch() {
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Games
           </Link>
-        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-dark-green-color/10 shadow-sm">
-          <div className="w-14 h-14 bg-dark-green-color rounded-2xl flex items-center justify-center shadow-lg shadow-dark-green-color/20 transition-transform hover:rotate-12">
-            <Grid className="h-7 w-7 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Memory Match</h1>
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Find the pairs</p>
+          <div className="flex items-center gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-dark-green-color/10 shadow-sm">
+            <div className="w-14 h-14 bg-dark-green-color rounded-2xl flex items-center justify-center shadow-lg shadow-dark-green-color/20 transition-transform hover:rotate-12">
+              <Grid className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Memory Match</h1>
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Find the pairs</p>
+            </div>
           </div>
         </div>
-        </div>
-        
+
         <div className="flex gap-4">
+          <div className="bg-white rounded-2xl px-6 py-3 shadow-lg shadow-gray-200/50 border-2 border-gray-50 text-center">
+            <div className="text-[10px] text-gray-400 font-black uppercase tracking-wider mb-1">Time</div>
+            <div className="text-2xl font-black text-gray-900">{Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</div>
+          </div>
+          <div className="bg-white rounded-2xl px-6 py-3 shadow-lg shadow-gray-200/50 border-2 border-gray-50 text-center">
+            <div className="text-[10px] text-gray-400 font-black uppercase tracking-wider mb-1">Best</div>
+            <div className="text-2xl font-black text-dark-green-color">
+              {bestTime > 0 ? `${Math.floor(bestTime / 60)}:${(bestTime % 60).toString().padStart(2, '0')}` : '--:--'}
+            </div>
+          </div>
           <div className="bg-white rounded-2xl px-6 py-3 shadow-lg shadow-gray-200/50 border-2 border-gray-50 text-center">
             <div className="text-[10px] text-gray-400 font-black uppercase tracking-wider mb-1">Moves</div>
             <div className="text-2xl font-black text-gray-900">{moves}</div>
-          </div>
-          <div className="bg-white rounded-2xl px-6 py-3 shadow-lg shadow-gray-200/50 border-2 border-gray-50 text-center">
-            <div className="text-[10px] text-gray-400 font-black uppercase tracking-wider mb-1">Matches</div>
-            <div className="text-2xl font-black text-dark-green-color">{matches}/{targetMatches}</div>
           </div>
         </div>
       </div>
@@ -208,7 +252,7 @@ export default function MemoryMatch() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)] opacity-30"></div>
           <h2 className="text-4xl font-black text-white mb-3 relative z-10">Victory! 🎉</h2>
           <p className="text-green-50 mb-8 text-lg relative z-10 font-medium">You identified all {targetMatches} vocabulary pairs in <span className="underline decoration-yellow-color decoration-4 underline-offset-4">{moves}</span> moves.</p>
-          <button 
+          <button
             onClick={initializeGame}
             className="bg-white text-dark-green-color px-10 py-4 rounded-2xl font-black hover:bg-yellow-color hover:text-dark-blue-color shadow-xl transition-all hover:-translate-y-1 active:scale-95 relative z-10 cursor-pointer"
           >
@@ -219,7 +263,7 @@ export default function MemoryMatch() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 perspective">
         {cards.map((card, index) => (
-          <div 
+          <div
             key={`${card.id}-${index}`}
             onClick={() => handleCardClick(index)}
             className={`
@@ -232,8 +276,8 @@ export default function MemoryMatch() {
             {/* Front of Card (Hidden initially) */}
             <div className={`
               absolute inset-0 backface-hidden rounded-2xl flex items-center justify-center p-6 text-center shadow-xl border-2
-              ${card.type === 'word' 
-                ? 'bg-white border-dark-green-color/20' 
+              ${card.type === 'word'
+                ? 'bg-white border-dark-green-color/20'
                 : 'bg-yellow-color/10 border-yellow-color/30'
               }
               rotate-y-180

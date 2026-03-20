@@ -21,6 +21,8 @@ model User {
   avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  highestScore Int @default(0)
+  fastestTime Int @default(0)
 
   words          UserWord[]
   chainScores    WordChainScore[]
@@ -48,8 +50,7 @@ model WordChainScore {
   id           Int      @id @default(autoincrement())
   userId       String
   user         User     @relation(fields: [userId], references: [id])
-  longestChain Int
-  highestScore Int
+  score        Int
   playedAt     DateTime @default(now())
 
   @@index([userId])
@@ -59,10 +60,8 @@ model MatchingGameScore {
   id          Int      @id @default(autoincrement())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  pairsCount  Int
-  timeSeconds Int
-  attempts    Int
-  completedAt DateTime @default(now())
+  time        Int
+  playedAt    DateTime @default(now())
 
   @@index([userId])
 }
