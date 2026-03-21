@@ -74,15 +74,15 @@ export default function Dictionary() {
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Enter a word to discover..."
-                className="w-full px-5 py-3 pl-12 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none"
+                placeholder="Enter a word"
+                className="w-full px-5 sm:py-3 py-2 pl-12 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none"
               />
               <BookOpen className="absolute left-4 top-4.5 h-5 w-5 text-gray-400" />
             </div>
             <button
               onClick={handleSearch}
               disabled={searching || !word.trim()}
-              className="px-6 py-0 bg-blue-color text-white rounded-2xl font-bold shadow-lg shadow-blue-color/20 hover:bg-dark-blue-color disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+              className="sm:px-6 px-2 py-0 bg-blue-color text-white rounded-2xl font-bold shadow-lg shadow-blue-color/20 hover:bg-dark-blue-color disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -106,11 +106,6 @@ export default function Dictionary() {
                 {definition.phonetic && (
                   <p className="text-gray-500 mt-1">{definition.phonetic}</p>
                 )}
-                {definition.audio && (
-                  <audio controls className="mt-2 h-8">
-                    <source src={definition.audio} type="audio/mpeg" />
-                  </audio>
-                )}
               </div>
               <button
                 onClick={handleAddToDictionary}
@@ -119,6 +114,12 @@ export default function Dictionary() {
                 + Add to Practice
               </button>
             </div>
+
+            {definition.audio && (
+              <audio controls className="mb-4 h-8">
+                <source src={definition.audio} type="audio/mpeg" />
+              </audio>
+            )}
 
             {/* Part of Speech */}
             <div className="mb-4">

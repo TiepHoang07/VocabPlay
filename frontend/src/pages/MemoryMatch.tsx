@@ -212,7 +212,7 @@ export default function MemoryMatch() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex justify-between items-end">
+      <div className="flex-row space-y-4 justify-between items-end">
         <div>
           <Link to="/games" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4">
             <ArrowLeft className="h-4 w-4 mr-1" />

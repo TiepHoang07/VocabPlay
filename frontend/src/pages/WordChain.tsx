@@ -181,16 +181,16 @@ export default function WordChain() {
             onChange={(e) => setInputWord(e.target.value)}
             disabled={loading}
             placeholder={chain.length > 0 ? `Starts with '${chain[chain.length - 1].slice(-1).toUpperCase()}'...` : 'Enter any word to start!'}
-            className="flex-1 px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none text-lg font-medium disabled:opacity-50"
+            className="flex-1 sm:px-5 px-2 sm:py-3 py-2 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none text-lg font-medium disabled:opacity-50"
             required
             autoFocus
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-color text-white px-6 py-3 rounded-2xl font-bold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 hover:-translate-y-0.5 transition-all active:scale-95 cursor-pointer flex items-center gap-2 disabled:opacity-50"
+            className="bg-blue-color text-white sm:px-6 px-4 sm:py-3 py-2 rounded-2xl font-bold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 hover:-translate-y-0.5 transition-all active:scale-95 cursor-pointer flex items-center gap-2 disabled:opacity-50"
           >
-            {loading ? 'Validating...' : 'Submit'}
+            {loading ? 'Checking...' : 'Submit'}
           </button>
         </form>
 

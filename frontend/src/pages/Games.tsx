@@ -39,7 +39,7 @@ export default function Games() {
           return (
             <div
               key={game.title}
-              className="group bg-yellow-50 rounded-3xl p-8 shadow-xl shadow-gray-200/50 border-2 border-gray-50 relative overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-gray-300/50"
+              className="group bg-yellow-50 rounded-3xl sm:p-8 p-6 shadow-xl shadow-gray-200/50 border-2 border-gray-50 relative overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-gray-300/50"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-blue-color/5 transition-colors"></div>
 
@@ -55,7 +55,7 @@ export default function Games() {
               </div>
 
               <h3 className="text-xl font-black text-gray-900 mb-2">{game.title}</h3>
-              <p className="text-gray-600 mb-8 leading-relaxed font-medium">{game.description}</p>
+              <p className="text-gray-600 sm:mb-8 mb-6 leading-relaxed font-medium">{game.description}</p>
 
               {!game.comingSoon && (
                 <Link
