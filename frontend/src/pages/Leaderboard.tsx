@@ -71,8 +71,8 @@ export default function Leaderboard() {
             {/* Header section */}
             <div className="flex flex-col items-center justify-center space-y-4">
                 <img className='w-88 h-50 border-b-4 border-b-yellow-color' src="penguin_leaderboard.webp" alt="Penguin Leaderboard" />
-                <h1 className="text-4xl font-black text-gray-900 tracking-tight">Hall of Fame</h1>
-                <p className="text-gray-500 text-lg max-w-lg mx-auto">
+                <h1 className="text-4xl font-black text-gray-900 tracking-tight">Leaderboard</h1>
+                <p className="text-gray-500 text-lg max-w-lg mx-auto text-center">
                     Celebrate the top vocabulary masters in our community. Are you on the list?
                 </p>
             </div>

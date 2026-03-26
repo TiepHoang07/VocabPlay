@@ -31,7 +31,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center">
         <img className="w-120 h-65" src="logo.webp" alt="logo" />
-        <p className="text-md font-semibold text-gray-600 max-w-2xl mb-2 mx-auto">
+        <p className="text-md font-semibold text-center text-gray-600 max-w-2xl mb-2 mx-auto">
           Expand your vocabulary, track your progress, and master new words
         </p>
         {!isSignedIn && (
