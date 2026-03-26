@@ -19,24 +19,15 @@ export const searchWord = async (req: Request, res: Response) => {
 
 export const getUserWords = async (req: Request, res: Response) => {
   try {
-    // Log the entire auth object to see its structure
-    console.log('Full auth object:', JSON.stringify((req as any).auth, null, 2));
+    const userId = (req as any).userId;
 
-    const clerkId = (req as any).userId;
-
-    console.log('Clerk ID from auth:', clerkId);
-
-    if (!clerkId) {
-      console.log('No clerkId in request');
+    if (!userId) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    // Find user in database by clerkId
     const user = await prisma.user.findUnique({
-      where: { clerkId },
+      where: { id: userId },
     });
-
-    console.log('User found:', user ? 'Yes' : 'No');
 
     if (!user) {
       return res.status(404).json({ error: "User not found in database" });
@@ -57,17 +48,15 @@ export const getUserWords = async (req: Request, res: Response) => {
 
 export const addWord = async (req: Request, res: Response) => {
   try {
-    const clerkId = (req as any).userId;
+    const userId = (req as any).userId;
     const { word, meaning, partOfSpeech, example, phonetic } = req.body;
 
-    console.log("addWord - clerkId:", clerkId);
-
-    if (!clerkId) {
+    if (!userId) {
       return res.status(401).json({ error: "You must be signed in" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { clerkId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -98,14 +87,14 @@ export const addWord = async (req: Request, res: Response) => {
 export const deleteWord = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const clerkId = (req as any).userId;
+    const userId = (req as any).userId;
 
-    if (!clerkId) {
+    if (!userId) {
       return res.status(401).json({ error: "You must be signed in" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { clerkId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -147,14 +136,14 @@ export const deleteWord = async (req: Request, res: Response) => {
 export const memorizeWord = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const clerkId = (req as any).userId;
+    const userId = (req as any).userId;
 
-    if (!clerkId) {
+    if (!userId) {
       return res.status(401).json({ error: "You must be sign in"})
     }
 
     const user = await prisma.user.findUnique({
-      where: { clerkId }
+      where: { id: userId }
     })
 
     if (!user) {

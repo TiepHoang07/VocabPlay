@@ -1,17 +1,13 @@
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/clerk-react";
 import { Link, useLocation } from "react-router-dom";
 import { BookOpen, Layers, Gamepad2, Home, Menu, X, Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuthContext } from "../context/AuthContext";
 
 export default function Navbar() {
   const location = useLocation();
   const [activeLink, setActiveLink] = useState(location.pathname);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuthContext();
 
   useEffect(() => {
     setActiveLink(location.pathname);
@@ -64,16 +60,17 @@ export default function Navbar() {
 
           {/* User Section */}
           <div className="flex items-center">
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="bg-blue-color text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 transition-all active:scale-95 cursor-pointer">
+            {user ? (
+               <Link to="/profile" className="flex items-center font-semibold text-dark-blue-color hover:opacity-80 transition cursor-pointer">
+                 <div className="w-8 h-8 rounded-full bg-dark-blue-color text-white flex items-center justify-center font-bold">
+                   {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                 </div>
+               </Link>
+            ) : (
+                <Link to="/login" className="bg-blue-color text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-dark-blue-color shadow-lg shadow-blue-color/20 transition-all active:scale-95 cursor-pointer">
                   Sign In
-                </button>
-              </SignInButton>
-            </SignedOut>
+                </Link>
+            )}
           </div>
         </div>
       </div>

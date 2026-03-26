@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuthContext } from "../context/AuthContext";
 import { ArrowLeft, Grid, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useApi } from '../hooks/useApi';
 import { getUserWords } from '../api/words';
 import { updateMatchingGameScore, getMatchingGameFastestTime } from '../api/gameScores';
 
@@ -23,8 +22,7 @@ interface Card {
 }
 
 export default function MemoryMatch() {
-  const { isSignedIn, isLoaded } = useAuth();
-  const { authRequest } = useApi();
+  const { user } = useAuthContext();
 
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,10 +46,10 @@ export default function MemoryMatch() {
     setIsActive(false);
     try {
       // Fetch best time from backend
-      const data = await getMatchingGameFastestTime(authRequest);
+      const data = await getMatchingGameFastestTime();
       if (data?.fastestTime) setBestTime(data.fastestTime);
 
-      const allWords: Word[] = await getUserWords(authRequest);
+      const allWords: Word[] = await getUserWords();
 
       // need at least 4 words for a good game
       if (allWords.length < 4) {
@@ -93,13 +91,13 @@ export default function MemoryMatch() {
     } finally {
       setLoading(false);
     }
-  }, [authRequest]);
+  }, []);
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
+    if (user) {
       initializeGame();
     }
-  }, [isLoaded, isSignedIn, initializeGame]);
+  }, [user, initializeGame]);
 
   // Timer logic
   useEffect(() => {
@@ -150,7 +148,7 @@ export default function MemoryMatch() {
           if (newMatches === targetMatches) {
             setIsActive(false);
             // Save time to backend
-            updateMatchingGameScore(authRequest, timer).catch(console.error);
+            updateMatchingGameScore(timer).catch(console.error);
           }
 
           toast.success("Match found!");
@@ -168,7 +166,7 @@ export default function MemoryMatch() {
     }
   };
 
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <div className="text-center py-20">
         <Grid className="h-16 w-16 text-gray-300 mx-auto mb-4" />

@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { BookOpen, Layers, Gamepad2, ArrowRight } from 'lucide-react'
-import { useAuth, SignUpButton } from '@clerk/clerk-react'
+import { useAuthContext } from '../context/AuthContext'
 
 export default function Home() {
-  const { isSignedIn } = useAuth()
+  const { user } = useAuthContext()
 
   const features = [
     {
@@ -34,13 +34,11 @@ export default function Home() {
         <p className="text-md font-semibold text-center text-gray-600 max-w-2xl mb-2 mx-auto">
           Expand your vocabulary, track your progress, and master new words
         </p>
-        {!isSignedIn && (
+        {!user && (
           <div className="pt-6">
-            <SignUpButton mode="modal">
-              <button className="bg-blue-color text-white px-8 py-4 rounded-2xl text-xl font-bold hover:bg-dark-blue-color shadow-xl shadow-blue-color/30 transition-all hover:-translate-y-1 active:scale-95 cursor-pointer">
-                Get Started Free
-              </button>
-            </SignUpButton>
+            <Link to="/register" className="bg-blue-color text-white px-8 py-4 rounded-2xl text-xl font-bold hover:bg-dark-blue-color shadow-xl shadow-blue-color/30 transition-all hover:-translate-y-1 active:scale-95 cursor-pointer inline-block">
+              Get Started Free
+            </Link>
           </div>
         )}
       </div>

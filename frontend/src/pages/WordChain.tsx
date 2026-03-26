@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuthContext } from "../context/AuthContext";
 import { ArrowLeft, Split, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { searchWord } from '../api/words';
-import { useApi } from '../hooks/useApi';
 import { updateWordChainScore, getWordChainHighScore } from '../api/gameScores';
 
 export default function WordChain() {
-  const { isSignedIn } = useAuth();
-  const { authRequest } = useApi();
+  const { user } = useAuthContext();
   const [chain, setChain] = useState<string[]>([]);
   const [inputWord, setInputWord] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,11 +28,11 @@ export default function WordChain() {
 
   useEffect(() => {
     const fetchHighScore = async () => {
-      const data = await getWordChainHighScore(authRequest);
+      const data = await getWordChainHighScore();
       if (data?.highestScore) setHighestScore(data.highestScore);
     };
     fetchHighScore();
-  }, [authRequest]);
+  }, []);
 
   useEffect(() => {
     let interval: any = null;
@@ -52,7 +50,7 @@ export default function WordChain() {
     if (time === 0) {
       if (score > highestScore) {
         setHighestScore(score);
-        updateWordChainScore(authRequest, score);
+        updateWordChainScore(score);
       }
       setIsGameComplete(true);
       setIsActive(false);
@@ -75,7 +73,7 @@ export default function WordChain() {
         toast.error('Word not found!');
         if (score > highestScore) {
           setHighestScore(score);
-          updateWordChainScore(authRequest, score);
+          updateWordChainScore(score);
         }
         setIsGameComplete(true);
         setIsActive(false);
@@ -90,7 +88,7 @@ export default function WordChain() {
           toast.error(`Word must start with '${requiredLetter}'!`);
           if (score > highestScore) {
             setHighestScore(score);
-            updateWordChainScore(authRequest, score);
+            updateWordChainScore(score);
           }
           setIsGameComplete(true);
           setIsActive(false);
@@ -101,7 +99,7 @@ export default function WordChain() {
           toast.error('Word already used in this chain!');
           if (score > highestScore) {
             setHighestScore(score);
-            updateWordChainScore(authRequest, score);
+            updateWordChainScore(score);
           }
           setIsGameComplete(true);
           setIsActive(false);
@@ -118,9 +116,9 @@ export default function WordChain() {
       const newScore = newChain.length;
       setScore(newScore);
 
-      // Save score to backend (handle error silently)
+      // Save score to backend
       if (newScore > highestScore) {
-        await updateWordChainScore(authRequest, newScore);
+        await updateWordChainScore(newScore);
       }
     } catch (error) {
       console.error("Game score update failed:", error);
@@ -129,7 +127,7 @@ export default function WordChain() {
     }
   };
 
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <div className="text-center py-20">
         <Split className="h-16 w-16 text-gray-300 mx-auto mb-4" />

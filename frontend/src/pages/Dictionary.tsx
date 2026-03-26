@@ -2,12 +2,10 @@ import { useState } from "react";
 import { Search, BookOpen, Loader2 } from "lucide-react";
 import { searchWord, addWordToDictionary } from "../api/words";
 import toast from "react-hot-toast";
-import { useAuth } from "@clerk/clerk-react";
-import { useApi } from "../hooks/useApi";
+import { useAuthContext } from "../context/AuthContext";
 
 export default function Dictionary() {
-  const { isSignedIn } = useAuth();
-  const { authRequest } = useApi();
+  const { user } = useAuthContext();
   const [word, setWord] = useState("");
   const [definition, setDefinition] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -35,13 +33,13 @@ export default function Dictionary() {
     if (!definition) return;
     console.log(definition);
 
-    if (!isSignedIn) {
+    if (!user) {
       toast.error("You need to sign in first !");
       return;
     }
 
     try {
-      await addWordToDictionary(authRequest, {
+      await addWordToDictionary({
         word: definition.word,
         meaning: definition.shortDefinition,
         partOfSpeech: definition.partOfSpeech,

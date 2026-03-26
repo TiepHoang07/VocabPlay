@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuthContext } from "../context/AuthContext";
 import { Layers, Loader2, BookOpen } from "lucide-react";
 import { getUserWords, deleteWord, memorizeWord } from "../api/words";
-import { useApi } from "../hooks/useApi"; // Import the hook
 import FlipCard from "../components/FlipCard";
 import toast from "react-hot-toast";
 
@@ -16,16 +15,15 @@ interface Word {
 }
 
 export default function Practice() {
-  const { isSignedIn, isLoaded } = useAuth();
-  const [words, setWords] = useState<Word[]>([]);
+  const { user, isLoading } = useAuthContext();
   const [loading, setLoading] = useState(true);
+  const [words, setWords] = useState<Word[]>([]);
   const [filter, setFilter] = useState<"learning" | "memorized">("learning");
-  const { authRequest } = useApi();
 
   const fetchWords = useCallback(async () => {
     setLoading(true);
     try {
-      const fetchedWords = await getUserWords(authRequest);
+      const fetchedWords = await getUserWords();
       if (filter === "memorized") {
         setWords(fetchedWords.filter((w: Word) => w.memorized === true));
       } else {
@@ -37,17 +35,17 @@ export default function Practice() {
     } finally {
       setLoading(false);
     }
-  }, [authRequest, filter]);
+  }, [filter]);
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
+    if (!isLoading && user) {
       fetchWords();
     }
-  }, [isLoaded, isSignedIn, fetchWords]);
+  }, [isLoading, user, fetchWords]);
 
   const handleMemorize = async (wordId: number) => {
     try {
-      await memorizeWord(authRequest, wordId);
+      await memorizeWord(wordId);
       toast.success("Word memorized!");
       // Re-fetch
       fetchWords();
@@ -58,7 +56,7 @@ export default function Practice() {
 
   const handleDelete = async (wordId: number) => {
     try {
-      await deleteWord(authRequest, wordId);
+      await deleteWord(wordId);
       toast.success("Word deleted");
       // Re-fetch
       fetchWords();
@@ -67,7 +65,7 @@ export default function Practice() {
     }
   };
 
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <div className="text-center py-20">
         <Layers className="h-16 w-16 text-gray-300 mx-auto mb-4" />

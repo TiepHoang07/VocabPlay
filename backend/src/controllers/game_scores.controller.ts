@@ -4,16 +4,16 @@ import prisma from "../services/prisma";
 export const updateWordChainScore = async (req: Request, res: Response) => {
     try {
         const { score } = req.body;
-        const clerkId = (req as any).userId;
+        const userId = (req as any).userId;
 
-        const user = await prisma.user.findUnique({ where: { clerkId } });
+        const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         if (score > user.highestScore) {
             await prisma.user.update({
-                where: { clerkId },
+                where: { id: userId },
                 data: { highestScore: score },
             });
         }
@@ -28,16 +28,16 @@ export const updateWordChainScore = async (req: Request, res: Response) => {
 export const updateMatchingGameScore = async (req: Request, res: Response) => {
     try {
         const { time } = req.body;
-        const clerkId = (req as any).userId;
+        const userId = (req as any).userId;
 
-        const user = await prisma.user.findUnique({ where: { clerkId } });
+        const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         if (user.fastestTime === 0 || time < user.fastestTime) {
             await prisma.user.update({
-                where: { clerkId },
+                where: { id: userId },
                 data: { fastestTime: time },
             });
         }
@@ -51,9 +51,9 @@ export const updateMatchingGameScore = async (req: Request, res: Response) => {
 
 export const getWordChainScore = async (req: Request, res: Response) => {
     try {
-        const clerkId = (req as any).userId;
+        const userId = (req as any).userId;
         const user = await prisma.user.findUnique({
-            where: { clerkId },
+            where: { id: userId },
             select: { highestScore: true }
         });
 
@@ -70,9 +70,9 @@ export const getWordChainScore = async (req: Request, res: Response) => {
 
 export const getMatchingGameScore = async (req: Request, res: Response) => {
     try {
-        const clerkId = (req as any).userId;
+        const userId = (req as any).userId;
         const user = await prisma.user.findUnique({
-            where: { clerkId },
+            where: { id: userId },
             select: { fastestTime: true }
         });
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuth, useUser } from '@clerk/clerk-react';
 import { Medal, Timer, Split, Star, User as UserIcon, Loader2 } from 'lucide-react';
-import { useApi } from '../hooks/useApi';
+import { useAuthContext } from "../context/AuthContext";
 import {
     getWordChainLeaderboard,
     getMatchingGameLeaderboard,
@@ -18,9 +17,7 @@ interface LeaderboardEntry {
 }
 
 export default function Leaderboard() {
-    const { isSignedIn, isLoaded } = useAuth();
-    const { user } = useUser();
-    const { authRequest } = useApi();
+    const { user, isLoading } = useAuthContext();
     const [activeTab, setActiveTab] = useState<'wordChain' | 'matchingGame'>('wordChain');
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<LeaderboardEntry[]>([]);
@@ -28,20 +25,20 @@ export default function Leaderboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!isLoaded) return;
+            if (isLoading) return;
             setLoading(true);
             try {
                 if (activeTab === 'wordChain') {
-                    const res = await getWordChainLeaderboard(authRequest);
+                    const res = await getWordChainLeaderboard();
                     setData(res);
                 } else {
-                    const res = await getMatchingGameLeaderboard(authRequest);
+                    const res = await getMatchingGameLeaderboard();
                     setData(res);
                 }
 
-                if (isSignedIn) {
-                    const scoreRes = await getWordChainHighScore(authRequest);
-                    const timeRes = await getMatchingGameFastestTime(authRequest);
+                if (user) {
+                    const scoreRes = await getWordChainHighScore();
+                    const timeRes = await getMatchingGameFastestTime();
                     setMyBest({
                         score: scoreRes?.highestScore || 0,
                         time: timeRes?.fastestTime || 0
@@ -55,9 +52,9 @@ export default function Leaderboard() {
         };
 
         fetchData();
-    }, [activeTab, isSignedIn, isLoaded, authRequest]);
+    }, [activeTab, user, isLoading]);
 
-    if (!isLoaded) return null;
+    if (isLoading) return null;
 
     const formatTime = (seconds: number) => {
         if (seconds === 0) return "--:--";
@@ -78,7 +75,7 @@ export default function Leaderboard() {
             </div>
 
             {/* Stats Summary for User */}
-            {isSignedIn && (
+            {user && (
                 <div className="grid grid-cols-2 gap-2 md:gap-4">
                     <div className="bg-blue-color/5 border-2 border-blue-color/10 rounded-3xl p-3 md:p-6 flex items-center gap-4 transition-all hover:border-blue-color/30 group">
                         <div className="w-12 h-12 bg-blue-color rounded-2xl flex items-center justify-center shadow-lg shadow-blue-color/20 group-hover:scale-110 transition-transform">
@@ -200,24 +197,6 @@ export default function Leaderboard() {
                     </div>
                 )}
             </div>
-
-            {/* Call to Action */}
-            {!isSignedIn && (
-                <div className="bg-gray-900 rounded-3xl p-10 text-center relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-color/20 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-blue-color/30 transition-all duration-700"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-color/10 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-yellow-color/20 transition-all duration-700"></div>
-
-                    <h2 className="text-2xl font-black text-white relative z-10 mb-4">Want to see your name here?</h2>
-                    <p className="text-gray-400 relative z-10 mb-8 max-w-md mx-auto font-medium">
-                        Sign in now to start tracking your progress and compete with vocabulary lovers worldwide.
-                    </p>
-                    <div className="relative z-10">
-                        <button className="bg-white text-gray-900 px-8 py-3.5 rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-white/5 active:scale-95">
-                            Get Started for Free
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

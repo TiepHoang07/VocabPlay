@@ -6,6 +6,9 @@ import Home from './pages/Home'
 import Practice from './pages/Practice'
 import Games from './pages/Games'
 import Leaderboard from './pages/Leaderboard'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Profile from './pages/Profile'
 
 import WordChain from './pages/WordChain'
 import MemoryMatch from './pages/MemoryMatch'
@@ -23,6 +26,9 @@ function App() {
           <Route path="games/word-chain" element={<WordChain />} />
           <Route path="games/memory" element={<MemoryMatch />} />
           <Route path="leaderboard" element={<Leaderboard />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,36 +1,14 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { handleClerkWebhook } from './webhooks/clerk';
 import wordsRouter from './routes/words.routes';
 import gameScoresRouter from './routes/game_scores.routes';
-import { clerkMiddleware } from '@clerk/express';
-
-dotenv.config();
+import authRouter from './routes/auth.routes';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Webhook route
-app.post(
-  '/api/webhooks/clerk',
-  express.raw({ type: 'application/json' }),
-  async (req, res) => {
-    try {
-      const result = await handleClerkWebhook(req.body, req.headers);
-      res.status(200).json(result);
-    } catch (err) {
-      console.error('Webhook error:', err);
-      res.status(400).json({ error: 'Webhook error' });
-    }
-  }
-);
-
-// Debug: log every incoming request before any middleware
-app.use((req, _res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
 
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -40,14 +18,9 @@ app.use(cors({
 
 app.use(express.json());
 
-// Clerk middleware
-app.use(clerkMiddleware({
-  secretKey: process.env.CLERK_SECRET_KEY,
-}));
-
-// Debug: confirm clerkMiddleware passed through
+// Debug: log every incoming request before any middleware
 app.use((req, _res, next) => {
-  console.log(`[clerk-passed] ${req.method} ${req.url} | auth:`, !!(req as any).auth?.userId);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
@@ -57,6 +30,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRouter);
 app.use('/api/words', wordsRouter);
 app.use('/api/game-scores', gameScoresRouter);
 
