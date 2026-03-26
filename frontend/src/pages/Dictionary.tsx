@@ -109,7 +109,7 @@ export default function Dictionary() {
                 onClick={handleAddToDictionary}
                 className="px-4 py-2 bg-blue-color hover:bg-dark-blue-color text-white rounded-lg cursor-pointer transition"
               >
-                + Add to Practice
+                + Add to Flip Cards
               </button>
             </div>
 

@@ -17,7 +17,7 @@ export default function Navbar() {
   const navLinks = [
     { to: "/", icon: Home, label: "Home" },
     { to: "/dictionary", icon: BookOpen, label: "Dictionary" },
-    { to: "/practice", icon: Layers, label: "Practice" },
+    { to: "/flipcards", icon: Layers, label: "Flip Cards" },
     { to: "/games", icon: Gamepad2, label: "Games" },
     { to: "/leaderboard", icon: Trophy, label: "Leaderboard" },
   ];

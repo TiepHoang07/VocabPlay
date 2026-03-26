@@ -159,6 +159,9 @@ export const getMe = async (req: Request, res: Response) => {
       id: user.id,
       email: user.email,
       name: user.name,
+      createdAt: user.createdAt,
+      highestScore: user.highestScore,
+      fastestTime: user.fastestTime,
     });
   } catch (error) {
     console.error("GetMe error:", error);

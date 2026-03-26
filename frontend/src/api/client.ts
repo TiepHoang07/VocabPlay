@@ -17,3 +17,13 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export const getMe = async () => {
+  const response = await api.get("/auth/me");
+  return response.data;
+};
+
+export const changePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+  const response = await api.post("/auth/change-password", { currentPassword, newPassword, confirmPassword });
+  return response.data;
+};

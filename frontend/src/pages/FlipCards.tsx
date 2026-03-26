@@ -14,7 +14,7 @@ interface Word {
   memorized: boolean;
 }
 
-export default function Practice() {
+export default function FlipCards() {
   const { user, isLoading } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [words, setWords] = useState<Word[]>([]);
@@ -82,16 +82,16 @@ export default function Practice() {
       {/* Header */}
       <div className="flex flex-col space-y-4 sm:flex-row items-center justify-center sm:justify-between">
         <div className="text-center sm:text-left">
-          <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Flip Cards</h1>
           <p className="text-gray-600 mt-1">
-            Flip cards to learn and memorize words
+            Practice with flip cards to learn and memorize words
           </p>
         </div>
 
         <div className="flex justify-center items-center gap-1.5 bg-gray-100/50 backdrop-blur-sm rounded-2xl p-1.5 shadow-inner max-w-[246px] sm:w-fit-content">
           <button
             onClick={() => setFilter("learning")}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${filter === "learning"
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer ${filter === "learning"
               ? "bg-blue-color text-white shadow-lg shadow-blue-color/20 translate-z-10"
               : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
               }`}
@@ -100,7 +100,7 @@ export default function Practice() {
           </button>
           <button
             onClick={() => setFilter("memorized")}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${filter === "memorized"
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer ${filter === "memorized"
               ? "bg-dark-green-color text-white shadow-lg shadow-dark-green-color/20 translate-z-10"
               : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
               }`}
