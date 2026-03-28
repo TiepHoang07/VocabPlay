@@ -13,6 +13,7 @@ export default function Dictionary() {
 
   const handleSearch = async () => {
     if (!word.trim()) return;
+    setDefinition(null);
 
     setSearching(true);
     setLoading(true);
@@ -64,7 +65,7 @@ export default function Dictionary() {
         </div>
 
         {/* Search Bar */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-lg px-3 py-4 sm:p-6 mb-6">
           <div className="flex gap-3">
             <div className="flex-1 relative">
               <input
@@ -73,9 +74,9 @@ export default function Dictionary() {
                 onChange={(e) => setWord(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 placeholder="Enter a word"
-                className="w-full px-5 sm:py-3 py-2 pl-12 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none"
+                className="w-full px-5 py-3 pl-10 sm:pl-12 rounded-2xl border-2 border-gray-100 focus:border-blue-color focus:ring-4 focus:ring-blue-color/10 transition-all outline-none"
               />
-              <BookOpen className="absolute left-4 top-3.5 sm:top-4.5 h-5 w-5 text-gray-400" />
+              <BookOpen className="absolute left-4 top-4 sm:top-4.5 h-5 w-5 text-gray-400" />
             </div>
             <button
               onClick={handleSearch}

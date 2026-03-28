@@ -79,7 +79,7 @@ export default function Leaderboard() {
                 <div className="grid grid-cols-2 gap-2 md:gap-4">
                     <div className="bg-blue-color/5 border-2 border-blue-color/10 rounded-3xl p-3 md:p-6 flex items-center gap-4 transition-all hover:border-blue-color/30 group">
                         <div className="w-12 h-12 bg-blue-color rounded-2xl flex items-center justify-center shadow-lg shadow-blue-color/20 group-hover:scale-110 transition-transform">
-                            <Split className="h-6 w-6 text-white" />
+                            <Split className="h-6 w-7 mx-2 text-white" />
                         </div>
                         <div>
                             <div className="text-xs font-black text-blue-color uppercase tracking-widest mb-0.5">My Best Chain</div>
@@ -88,7 +88,7 @@ export default function Leaderboard() {
                     </div>
                     <div className="bg-green-color/5 border-2 border-green-color/10 rounded-3xl p-3 md:p-6 flex items-center gap-4 transition-all hover:border-green-color/30 group">
                         <div className="w-12 h-12 bg-green-color rounded-2xl flex items-center justify-center shadow-lg shadow-green-color/20 group-hover:scale-110 transition-transform">
-                            <Timer className="h-6 w-6 text-white" />
+                            <Timer className="h-6 w-7 mx-2 text-white" />
                         </div>
                         <div>
                             <div className="text-xs font-black text-green-color uppercase tracking-widest mb-0.5">My Fastest Match</div>
