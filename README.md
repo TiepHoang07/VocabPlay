@@ -1,5 +1,7 @@
 # Vocabplay
 
+![Vocabplay](frontend/src/assets/WebImages/vocabplay.png)
+
 Vocabplay is an interactive vocabulary learning application built to help users expand their word knowledge through active practice and memorization.
 
 ## 🚀 Features
