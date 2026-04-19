@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { BookOpen, Layers, Gamepad2, ArrowRight } from 'lucide-react'
 import { useAuthContext } from '../context/AuthContext'
+import logo from '../assets/logo.webp'
 
 export default function Home() {
   const { user } = useAuthContext()
@@ -30,7 +31,7 @@ export default function Home() {
     <div className="space-y-12">
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center">
-        <img className="w-120 h-65" src="logo.webp" alt="logo" />
+        <img className="w-120 h-65" src={logo} alt="logo" />
         <p className="text-md font-semibold text-center text-gray-600 max-w-2xl mb-2 mx-auto">
           Expand your vocabulary, track your progress, and master new words
         </p>

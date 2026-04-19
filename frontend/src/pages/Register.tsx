@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { api } from "../api/client";
+import logo from '../assets/logo.webp'
 import toast from "react-hot-toast";
 
 export default function Register() {
@@ -31,7 +32,7 @@ export default function Register() {
     <div className="min-h-[80vh] flex items-center justify-center">
       <div className="max-w-md w-full p-8 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
         <div className="flex justify-center">
-          <img src="/logo.webp" alt="Logo" className="w-100 h-50" />
+          <img src={logo} alt="Logo" className="w-100 h-50" />
         </div>
         <h2 className="text-3xl font-black text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-color to-cyan-color">
           Create Account

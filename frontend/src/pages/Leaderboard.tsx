@@ -7,6 +7,7 @@ import {
     getWordChainHighScore,
     getMatchingGameFastestTime
 } from '../api/gameScores';
+import penguin_leaderboard from '../assets/penguin_leaderboard.webp';
 
 interface LeaderboardEntry {
     id: string;
@@ -67,7 +68,7 @@ export default function Leaderboard() {
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
             {/* Header section */}
             <div className="flex flex-col items-center justify-center space-y-4">
-                <img className='w-88 h-50 border-b-4 border-b-yellow-color' src="penguin_leaderboard.webp" alt="Penguin Leaderboard" />
+                <img className='w-88 h-50 border-b-4 border-b-yellow-color' src={penguin_leaderboard} alt="Penguin Leaderboard" />
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight">Leaderboard</h1>
                 <p className="text-gray-500 text-lg max-w-lg mx-auto text-center">
                     Celebrate the top vocabulary masters in our community. Are you on the list?
