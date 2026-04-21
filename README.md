@@ -23,14 +23,13 @@ Vocabplay is an interactive vocabulary learning application built to help users 
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first styling
 - **Lucide React** - Beautifully simple icons
-- **Clerk React** - Authentication and user management
 - **React Router** - Client-side routing
 
 ### Backend
 - **Node.js & Express** - Scalable server-side logic
 - **Prisma** - Next-generation ORM for PostgreSQL
 - **PostgreSQL** - Reliable relational database
-- **Clerk Backend SDK** - Secure authentication on the server
+- **JWT Authentication** - Secure authentication on the server
 - **Svix** - Webhook handling
 
 ## 📄 License
